@@ -1,0 +1,67 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-type" content="text/html;charset=UTF-8" /> 
+	<title>#toss140 – one-line summaries of newspaper columns</title>
+	<link rel="stylesheet" type="text/css" href="/toss.css" />
+	<!--
+	{%if debug%}
+	<script type='text/javascript' src='js/lib/jquery-1.3.2.js'></script>
+	{%else%}
+	<script type='text/javascript' src='js/lib/jquery-1.3.2.min.js'></script>
+	{%endif%}
+	-->
+</head>
+<body>
+	<div id="content">
+		<h1>#toss140</h1>
+		<div id="info">
+			<h2>what is this?</h2>
+			<p>toss140.net is a crowdsourced summary of newspaper columnists, so you can be on top of the pundits, and decide if you want to read them.</p>
+
+			<h2>how do i write a summary?</h2>
+			<p>just twitter your summary, and include a link to the piece you're summarising (shortened is fine, we are very clever). as long as you include the hashtag <code>#toss140</code>, we will find your tweet and the website will do the rest, deducing the author name, the newspaper title, the date, etc.</p>
+
+			<h2>cool, but the page is messy?</h2>
+			<p>it was built on a whim yesterday in response to <a href="http://twitter.com/bengoldacre/status/2514941842">this tweet</a>. if you tweet a summary right now, we will polish it tomorrow, so that the page is organised by author, date, and newspaper. then we will make it pretty, then we will pimp it to the world.</p>
+
+			<h2>truly you are people of action!</h2>
+			<p>we are.</p>
+			
+		</div>
+		<div id="tweets">
+		{% for tweet in tweets %}
+			{% if tweet.long_url and not tweet.is_retweet %}
+				<div class="tweetbox">
+					<div class="tweet">{{ tweet.text }}{%if admin%}
+						[<a href="/admin/datastore/edit?key={{tweet.key}}&amp;kind=Tweet&amp;next=%3F">edit</a>]{%endif%}</div>
+					<div class="meta">
+						–&nbsp;
+						@<a href="http://twitter.com/{{tweet.from_user}}/status/{{tweet.id}}">{{tweet.from_user}}</a>
+						summarising <a href="{{ tweet.long_url }}">
+							<i>{%if tweet.article.title%}{{tweet.article.title}}{%else%}{{tweet.long_url}}{%endif%}</i>
+						</a>
+						{%if tweet.article.author%}by {{tweet.article.author}}{%endif%}
+						from {%if tweet.article.parent.name%}{{tweet.article.parent.name}}{%else%}{{tweet.article.parent.host}}{%endif%}
+						{%if admin%}[<a href="/admin/datastore/edit?key={{tweet.article.key}}&amp;kind=Article&amp;next=%3F">edit</a>]
+						[<a href="/do/index-tweet?key={{tweet.key}}">reindex</a>]{%endif%}
+					</div>
+				</div>
+			{% endif %}
+		{% endfor %}
+		</div>
+	</div>
+	<div class="attribution">#toss140 conceived by @<a href="http://twitter.com/bengoldacre">bengoldacre</a> &middot; web site by @<a href="http://twitter.com/robinhouston">robinhouston</a></div>
+	<script type="text/javascript">
+	var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+	document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+	</script>
+	<script type="text/javascript">
+	try {
+	var pageTracker = _gat._getTracker("UA-9696195-1");
+	pageTracker._trackPageview();
+	} catch(err) {}</script>
+	</body>
+</html>

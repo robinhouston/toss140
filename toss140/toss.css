@@ -1,0 +1,85 @@
+body {
+	background: black;
+	font-family: Gill Sans, sans-serif;
+	font-size:16px;
+}
+
+a:link, a:visited {
+	    text-decoration: none; color: #008;
+}
+
+h1 {
+	color: #008;
+	background: #fff;
+	line-height: 150%;
+	padding-left: 20px;
+	
+	-moz-border-radius-topright: 5px;
+	-moz-border-radius-topleft: 5px;
+	-webkit-border-top-right-radius: 5px;
+	-webkit-border-top-left-radius: 5px;
+	
+	border-bottom: 1px dotted black;
+}
+
+#content {
+	background: #94E4E8;
+	left: 10px;
+	right: 10px;
+	padding-bottom: 10px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	line-height: 1.2em;
+	//width: 100%;
+}
+
+#info {
+	position: absolute;
+	width: 300px;
+	right: 20px;
+	background: white;
+	padding-left: 10px;
+	padding-right: 10px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	line-height: 1.1em;
+	color: #333;
+}
+#info h2 {
+	line-height: 1.1em;
+}
+
+.tweetbox {
+	background: #DFF;
+	margin-left: 10px;
+	padding-left: 10px;
+	padding-top: 5px;
+	margin-bottom: 10px;
+	margin-right: 350px;
+}
+
+.meta {
+	padding-left: 20px;
+	padding-top: 10px;
+	padding-bottom: 5px;
+	color: #666;
+}
+.meta a:link, .meta a:visited {
+	color: #559;
+}
+
+.attribution {
+	bottom: 10px;
+	left: 10px;
+	right: 10px;
+	padding-left: 1em;
+	margin-top: 15px;
+	font-family: Hoefler Text, serif;
+	background: white;
+	line-height: 150%;
+	background: #444;
+}
+
+.attribution a:link, .attribution a:visited {
+	color: #005;
+}

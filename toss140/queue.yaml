@@ -1,0 +1,6 @@
+queue:
+  - name: add-tweet
+    rate: 1/s
+  - name: index-tweet
+    rate: 1/s
+    

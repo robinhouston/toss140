@@ -1,0 +1,3 @@
+cron:
+  - url: /do/update
+    schedule: every 5 minutes

@@ -1,0 +1,35 @@
+application: toss140
+version: 1
+runtime: python
+api_version: 1
+
+handlers:
+- url: /
+  script: toss.py
+
+- url: /do/update
+  script: update.py
+
+- url: /do/add-tweet
+  script: update.py
+  login: admin # Invoked only by task queue
+
+- url: /do/index-tweets
+  script: update.py
+
+- url: /do/index-tweet
+  script: update.py
+  login: admin # Invoked only by task queue
+
+- url: /(toss\.css)
+  static_files: \1
+  upload: toss\.css
+
+- url: /(js/.*\.js)
+  static_files: \1
+  upload: js/.*\.js
+
+
+- url: /admin(/.*)?
+  script: $PYTHON_LIB/google/appengine/ext/admin
+  login: admin # DO NOT REMOVE
