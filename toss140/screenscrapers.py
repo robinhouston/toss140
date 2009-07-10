@@ -11,7 +11,9 @@ def scrape_guardian(content):
   
   mo_author = re.search(r'''s\['prop6'\]="(.*)";''', content)
   if mo_author:
-    r['author'] = mo_author.group(1)
+    author = mo_author.group(1)
+    author = re.sub(r'\s+\(contributor\)$', '', author)
+    r['author'] = author
   
   return r
 
@@ -52,9 +54,11 @@ def scrape_express(content):
   if mo_title:
     r['title'] = re.sub(r'.*::\s*', '', mo_title.group(1))
 
-  mo_date = re.search(r'<span class="datetime">([A-Z][a-z]+ \d\d?)(st|nd|rd|th)( [A-Z][a-z]+ \d\d\d\d)', content)
+  # At the time of writing there's no space between the comma and the year,
+  # but that seems like something they might fix, so we allow for spaces there.
+  mo_date = re.search(r'<p class="date">\s*([A-Z][a-z]+ [A-Z][a-z]+ \d+),\s*(\d\d\d\d)', content)
   if mo_date:
-    r['date'] = datetime.datetime.strptime(mo_date.group(1) + mo_date.group(3), '%A %d %B %Y').date()
+    r['date'] = datetime.datetime.strptime(mo_date.group(1) + mo_date.group(2), '%A %B %d %Y').date()
 
   mo_author = re.search(r'''By <span class="bold">([^<]+)''', content)
   if mo_author:
@@ -69,7 +73,14 @@ def scrape_mail(content):
   if mo:
     r['author'] = mo.group(1)
     r['date'] = datetime.datetime.strptime(mo.group(2) + mo.group(4), '%d %B %Y').date()
-
+  
+  # Stephen Glover is special
+  elif re.search(r'<meta name="divclassbody" content="stephen-glover" />', content):
+    r['author'] = 'Stephen Glover'
+    mo = re.search(r'''Last updated at \d\d?:\d\d? [AP]M on (\d\d)(st|nd|rd|th)( [A-Z][a-z]+ \d\d\d\d)''', content)
+    if mo:
+      r['date'] = datetime.datetime.strptime(mo.group(1) + mo.group(3), '%d %B %Y').date()
+  
   return r
 
 def scrape_cnet(content):
@@ -85,13 +96,42 @@ def scrape_cnet(content):
 
   return r
 
+def scrape_independent(content):
+  # Only works for /opinion/commentators at the moment
+  r = {}
+  
+  mo_date = re.search(r'<meta name="icx_pubdate" content="(\d\d/\d\d/\d\d\d\d)"/>', content)
+  if mo_date:
+    r['date'] = datetime.datetime.strptime(mo_date.group(1), '%d/%m/%Y').date()
+  
+  if re.search(r'''var contextName = 'independent_www_opinion_commentators';''', content):
+    mo_commentator = re.search(r'<meta name="icx_section" content="([^"]+)"/>', content)
+    if mo_commentator:
+      r['author'] = mo_commentator.group(1)
+  
+  return r
+
+def scrape_telegraph(content):
+  r = {}
+  
+  mo_author = re.search(r'<meta name="author" content="By ([^"]+\S)\s*" />', content)
+  if mo_author:
+    r['author'] = mo_author.group(1)
+  
+  mo_date = re.search(r'meta name="DC.date.issued" content="(\d\d\d\d-\d\d-\d\d)" />', content)
+  if mo_author:
+    r['date'] = datetime.datetime.strptime(mo_date.group(1), '%Y-%m-%d').date()
+
+  return r
 
 scrapers = {
   "guardian.co.uk":     scrape_guardian,
+  "independent.co.uk":  scrape_independent,
   "news.bbc.co.uk":     scrape_bbc,
   "timesonline.co.uk":  scrape_times,
   "dailyexpress.co.uk": scrape_express,
   "dailymail.co.uk":    scrape_mail,
+  "telegraph.co.uk":    scrape_telegraph,
   "news.cnet.com":      scrape_cnet,
 }
 

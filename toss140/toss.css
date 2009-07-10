@@ -1,15 +1,32 @@
 body {
-	background: black;
-	font-family: Gill Sans, sans-serif;
+	background: #333;
+	font-family: Corbel, Gill Sans, sans-serif;
 	font-size:16px;
 }
 
 a:link, a:visited {
-	    text-decoration: none; color: #008;
+	text-decoration: none; color: #668;
+}
+
+a.admin {
+	font-family: Futura;
+	color: orange !important;
+}
+
+#content {
+	background: #94E4E8;
+	width: 900px;
+	margin-left: auto;
+	margin-right: auto;
+	padding-bottom: 10px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	line-height: 1.2em;
+	position: relative;
 }
 
 h1 {
-	color: #008;
+	color: #3cf;
 	background: #fff;
 	line-height: 150%;
 	padding-left: 20px;
@@ -19,29 +36,27 @@ h1 {
 	-webkit-border-top-right-radius: 5px;
 	-webkit-border-top-left-radius: 5px;
 	
+	margin-top: 0px;
+	margin-bottom: 0px;
 	border-bottom: 1px dotted black;
 }
 
-#content {
-	background: #94E4E8;
-	left: 10px;
-	right: 10px;
-	padding-bottom: 10px;
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;
-	line-height: 1.2em;
-	//width: 100%;
+.logout {
+	position: absolute;
+	top: 10px;
+	right: 30px;
 }
 
 #info {
 	position: absolute;
 	width: 300px;
-	right: 20px;
+	right: 10px;
 	background: white;
 	padding-left: 10px;
 	padding-right: 10px;
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
+	border: 1px solid #666;
 	line-height: 1.1em;
 	color: #333;
 }
@@ -50,12 +65,13 @@ h1 {
 }
 
 .tweetbox {
-	background: #DFF;
-	margin-left: 10px;
+	background: #EFF;
 	padding-left: 10px;
 	padding-top: 5px;
-	margin-bottom: 10px;
-	margin-right: 350px;
+	padding-right: 8px;
+	margin-left: 10px;
+	border-bottom: 1px dotted #FAA;
+	margin-right: 340px;
 }
 
 .meta {
@@ -64,22 +80,65 @@ h1 {
 	padding-bottom: 5px;
 	color: #666;
 }
-.meta a:link, .meta a:visited {
+
+.tweeter {
+	float: right;
+}
+
+.date {
+	font-weight: bold;
+	margin-top: 15px;
+	margin-left: 1em;
+	color: #900;
+}
+#articles {
+	background: #EFF;
+	padding-left: 10px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	padding-right: 8px;
+	margin-left: 10px;
+	margin-right: 10px;
+	margin-top: 10px;
+	margin-bottom: 5px;
+	width: 600px;
+}
+.tweet {
+	margin-left: 2em;
+}
+
+.articlebox {
+	margin-bottom: 10px;
+}
+.articlebox .tweeter {
+	float: none;
+	display: inline;
+	font-size: 80%;
+	color: #666;
+	margin-left: 4px;
+}
+.articlebox .tweeter a:link, .articlebox .tweeter a:visited {
 	color: #559;
+}
+.author {
+	margin-left: 1em;
+	margin-top: 3px;
+	color: #666;
 }
 
 .attribution {
+	position: static;
 	bottom: 10px;
+	text-align: center;
 	left: 10px;
 	right: 10px;
 	padding-left: 1em;
 	margin-top: 15px;
 	font-family: Hoefler Text, serif;
-	background: white;
 	line-height: 150%;
-	background: #444;
+	color: #666;
 }
 
 .attribution a:link, .attribution a:visited {
-	color: #005;
+	color: #559;
 }

@@ -1,5 +1,5 @@
 import logging
-import urllib
+import re
 
 from google.appengine.ext import db
 from google.appengine.api import memcache
@@ -12,13 +12,12 @@ class Stats(db.Model):
 # The key name is the hostname of the web site
 class Site(db.Model):
   host = db.StringProperty(required=True)
-  name = db.StringProperty(required=False, default=None)
+  name = db.StringProperty(required=True)
 
 # Every Article should have a parent that is a Site
 # The key name is the ultimate URL of the article
 class Article(db.Model):
   url    = db.StringProperty(required=True)
-  pub    = db.StringProperty(required=False)
   author = db.StringProperty(required=False)
   title  = db.StringProperty(required=False)
   date   = db.DateProperty  (required=False)
@@ -57,4 +56,7 @@ def get_site(hostname):
   return site
 
 def get_site_name(hostname):
-  url = 'http://' + hostname + '/'
+  # It's hard to get the name from the site itself, because different sites format
+  # the <title> of the front page in a bewildering variety of different ways. Just
+  # fake the name up from the URL, and expect it will be edited.
+  return re.sub(r'^www\.', '', hostname)

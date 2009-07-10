@@ -7,6 +7,18 @@ handlers:
 - url: /
   script: toss.py
 
+- url: /author/[^/]+
+  script: toss.py
+
+- url: /tweeter/[^/]+
+  script: toss.py
+
+- url: /organ/[^/]+
+  script: toss.py
+
+- url: /timeline
+  script: toss.py
+
 - url: /do/update
   script: update.py
 
@@ -25,10 +37,17 @@ handlers:
   static_files: \1
   upload: toss\.css
 
+- url: /(.*\.png)
+  static_files: \1
+  upload: .*\.png
+
 - url: /(js/.*\.js)
   static_files: \1
   upload: js/.*\.js
 
+- url: /login
+  login: admin
+  script: toss.py
 
 - url: /admin(/.*)?
   script: $PYTHON_LIB/google/appengine/ext/admin
