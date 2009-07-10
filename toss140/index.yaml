@@ -10,7 +10,7 @@ indexes:
 # automatically uploaded to the admin console when you next deploy
 # your application using appcfg.py.
 
-# Used 89 times in query history.
+# Used 90 times in query history.
 - kind: Article
   properties:
   - name: author
@@ -31,14 +31,14 @@ indexes:
   - name: date
     direction: desc
 
-# Used 1304 times in query history.
+# Used 1305 times in query history.
 - kind: Tweet
   properties:
   - name: article
   - name: created_at
     direction: desc
 
-# Used once in query history.
+# Used 5 times in query history.
 - kind: Tweet
   properties:
   - name: from_user

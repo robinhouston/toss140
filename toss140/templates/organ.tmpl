@@ -1,54 +1,38 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+{% extends "master.tmpl" %}
 
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-<head>
-	<meta http-equiv="Content-type" content="text/html;charset=UTF-8" /> 
-	<title>{{organ}} | toss140.net</title>
-	<link rel="stylesheet" type="text/css" href="/toss.css" />
-	<!--
-	{%if debug%}
-	<script type='text/javascript' src='js/lib/jquery-1.3.2.js'></script>
-	{%else%}
-	<script type='text/javascript' src='js/lib/jquery-1.3.2.min.js'></script>
-	{%endif%}
-	-->
-</head>
-<body>
-	<div id="content">
-		<h1>toss140.net</h1>
-		{% if logout_url %}
-			<div class="logout"><a href="{{logout_url}}">log out</a></div>
-		{% endif %}
-		<div id="articles">
-		<h2>From {{organ}}</h2>
-		{% for tweet in tweets %}
-			<div class="articlebox">
-				{%ifchanged tweet.article.date%}
-					<div class="date">{{tweet.article.date|date:"D jS F Y"}}</div>
-				{%endifchanged%}
-				{%ifchanged tweet.article%}
-				<!-- {{tweet.article.title}} -->
-				{%endifchanged%}
-				<div class="tweet">
-					&quot;{{tweet.text|escape}}&quot;
-					<div class="tweeter"><a
-						 href="http://twitter.com/{{tweet.from_user}}/status/{{tweet.id}}">{{tweet.from_user}}</a>
-					</div>
-					<div class="author">
-						– {%if tweet.article.author%}
-								<a href="/author/{{tweet.article.author|urlencode}}">{{tweet.article.author}}</a>,
-							{%else%}
-								author unknown,
-							{%endif%}
-						{{tweet.article.parent.name}}
-						<a href="{{tweet.long_url}}"><img src="/Icon_External_Link.png" /></a>
-					</div>
+{% block title %}{{organ}} | toss140.net{% endblock %}
+
+{% block content %}
+	<h1>toss140.net</h1>
+	{% if logout_url %}
+		<div class="logout"><a href="{{logout_url}}">log out</a></div>
+	{% endif %}
+	<div id="articles">
+	<h2>From {{organ}}</h2>
+	{% for tweet in tweets %}
+		<div class="articlebox">
+			{%ifchanged tweet.article.date%}
+				<div class="date">{{tweet.article.date|date:"D jS F Y"}}</div>
+			{%endifchanged%}
+			{%ifchanged tweet.article%}
+			<!-- {{tweet.article.title}} -->
+			{%endifchanged%}
+			<div class="tweet">
+				&quot;{{tweet.text|escape}}&quot;
+				<div class="tweeter"><a
+					 href="http://twitter.com/{{tweet.from_user}}/status/{{tweet.id}}">{{tweet.from_user}}</a>
+				</div>
+				<div class="author">
+					– {%if tweet.article.author%}
+							<a href="/author/{{tweet.article.author|urlencode}}">{{tweet.article.author}}</a>,
+						{%else%}
+							author unknown,
+						{%endif%}
+					{{tweet.article.parent.name}}
+					<a href="{{tweet.long_url}}"><img src="/Icon_External_Link.png" /></a>
 				</div>
 			</div>
-		{% endfor %}
 		</div>
+	{% endfor %}
 	</div>
-	{% include "analytics.inc" %}
-	</body>
-</html>
+{% endblock %}

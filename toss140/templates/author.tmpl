@@ -1,33 +1,17 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+{% extends "master.tmpl" %}
 
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-<head>
-	<meta http-equiv="Content-type" content="text/html;charset=UTF-8" /> 
-	<title>{{author}} | #toss140</title>
-	<link rel="stylesheet" type="text/css" href="/toss.css" />
-	<!--
-	{%if debug%}
-	<script type='text/javascript' src='js/lib/jquery-1.3.2.js'></script>
-	{%else%}
-	<script type='text/javascript' src='js/lib/jquery-1.3.2.min.js'></script>
-	{%endif%}
-	-->
-</head>
-<body>
-	<div id="content">
-		<h1>Articles by {{author}}</h1>
-		{% if logout_url %}
-			<div class="logout"><a href="{{logout_url}}">log out</a></div>
-		{% endif %}
-		<div id="articles">
+{% block title %}{{author}} | #toss140{% endblock %}
+
+{% block content %}
+	<h1>Articles by {{author}}</h1>
+	{% if logout_url %}
+		<div class="logout"><a href="{{logout_url}}">log out</a></div>
+	{% endif %}
+	<div id="articles">
 		{% for tweet in tweets %}
 			<div class="articlebox">
 				{%ifchanged tweet.article.date%}
 					<div class="date">{{tweet.article.date|date:"D jS F Y"}}</div>
-				{%endifchanged%}
-				{%ifchanged tweet.article%}
-				<!-- {{tweet.article.title}} -->
 				{%endifchanged%}
 				<div class="tweet">
 					&quot;{{tweet.text|escape}}&quot;
@@ -39,8 +23,5 @@
 				</div>
 			</div>
 		{% endfor %}
-		</div>
 	</div>
-	{% include "analytics.inc" %}
-	</body>
-</html>
+{% endblock %}

@@ -1,33 +1,17 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+{% extends "master.tmpl" %}
 
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-<head>
-	<meta http-equiv="Content-type" content="text/html;charset=UTF-8" /> 
-	<title>toss140 – one-line summaries of newspaper columns</title>
-	<link rel="stylesheet" type="text/css" href="/toss.css" />
-	<!--
-	{%if debug%}
-	<script type='text/javascript' src='js/lib/jquery-1.3.2.js'></script>
-	{%else%}
-	<script type='text/javascript' src='js/lib/jquery-1.3.2.min.js'></script>
-	{%endif%}
-	-->
-</head>
-<body>
-	<div id="content">
-		<h1>toss140.net</h1>
-		{% if logout_url %}
-			<div class="logout"><a href="{{logout_url}}">log out</a></div>
-		{% endif %}
-		<div id="info">{% include "info.inc" %}</div>
-		<div id="tweets">
-		{% for tweet in recent %}
-			{% include "tweetbox.inc" %}
-		{% endfor %}
-		</div>
-		<div class="attribution">#toss140 conceived by @<a href="http://twitter.com/bengoldacre">bengoldacre</a> &middot; web site by @<a href="http://twitter.com/robinhouston">robinhouston</a></div>
+{% block title %}toss140 – one-line summaries of newspaper columns{% endblock %}
+
+{% block content %}
+	<h1>toss140.net</h1>
+	{% if logout_url %}
+		<div class="logout"><a href="{{logout_url}}">log out</a></div>
+	{% endif %}
+	<div id="info">{% include "info.inc" %}</div>
+	<div id="tweets">
+	{% for tweet in recent %}
+		{% include "tweetbox.inc" %}
+	{% endfor %}
 	</div>
-	{% include "analytics.inc" %}
-	</body>
-</html>
+	<div class="attribution">#toss140 conceived by @<a href="http://twitter.com/bengoldacre">bengoldacre</a> &middot; web site by @<a href="http://twitter.com/robinhouston">robinhouston</a></div>
+{% endblock %}

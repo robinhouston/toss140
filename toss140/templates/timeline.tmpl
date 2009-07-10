@@ -1,62 +1,46 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+{% extends "master.tmpl" %}
 
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-<head>
-	<meta http-equiv="Content-type" content="text/html;charset=UTF-8" /> 
-	<title>Columnist timeline | toss140.net</title>
-	<link rel="stylesheet" type="text/css" href="/toss.css" />
-	<!--
-	{%if debug%}
-	<script type='text/javascript' src='js/lib/jquery-1.3.2.js'></script>
-	{%else%}
-	<script type='text/javascript' src='js/lib/jquery-1.3.2.min.js'></script>
-	{%endif%}
-	-->
-</head>
-<body>
-	<div id="content">
-		<h1>toss140.net</h1>
-		{% if logout_url %}
-			<div class="logout"><a href="{{logout_url}}">log out</a></div>
-		{% endif %}
-		<div id="articles">
-		<h2>Columnist timeline</h2>
-		{% for x in list %}
-			<div class="articlebox">
-				{% ifchanged x.article.date %}
-					<div class="date">{{x.article.date|date:"D jS F Y"}}</div>
-				{% endifchanged %}
-				{% for tweet in x.tweets %}
-					{% if not tweet.is_retweet %}
-						<div class="tweet">
-							&quot;{{tweet.text|escape}}&quot;
-							{%if admin%}
-								<a class="admin" href="/admin/datastore/edit?key={{tweet.key}}&amp;kind=Tweet&amp;next={{this_page|urlencode}}">e</a>
-								<a class="admin" href="/do/index-tweet?key={{tweet.key}}">r</a>
-							{%endif%}
-							<div class="tweeter"><a
-								 href="http://twitter.com/{{tweet.from_user}}/status/{{tweet.id}}">{{tweet.from_user}}</a>
-							</div>
-						</div>
-					{% endif %}
-				{% endfor %}
-				<div class="author">
-					– {%if x.article.author%}
-							<a href="/author/{{x.article.author|urlencode}}">{{x.article.author}}</a>,
-						{%else%}
-							author unknown,
+{% block title %Columnist timeline | toss140.net{% endblock %}
+
+{% block content %}
+	<h1>toss140.net</h1>
+	{% if logout_url %}
+		<div class="logout"><a href="{{logout_url}}">log out</a></div>
+	{% endif %}
+	<div id="articles">
+	<h2>Columnist timeline</h2>
+	{% for x in list %}
+		<div class="articlebox">
+			{% ifchanged x.article.date %}
+				<div class="date">{{x.article.date|date:"D jS F Y"}}</div>
+			{% endifchanged %}
+			{% for tweet in x.tweets %}
+				{% if not tweet.is_retweet %}
+					<div class="tweet">
+						&quot;{{tweet.text|escape}}&quot;
+						{%if admin%}
+							<a class="admin" href="/admin/datastore/edit?key={{tweet.key}}&amp;kind=Tweet&amp;next={{this_page|urlencode}}">e</a>
+							<a class="admin" href="/do/index-tweet?key={{tweet.key}}">r</a>
 						{%endif%}
-					<a href="/organ/{{x.article.parent.name|urlencode}}">{{x.article.parent.name}}</a>
-					<a href="{{tweet.long_url|escape}}"><img src="/Icon_External_Link.png" /></a>
-					{%if admin%}
-						<a class="admin" href="/admin/datastore/edit?key={{x.article.key}}&amp;kind=Article&amp;next={{this_page|urlencode}}">e</a>
+						<div class="tweeter"><a
+							 href="http://twitter.com/{{tweet.from_user}}/status/{{tweet.id}}">{{tweet.from_user}}</a>
+						</div>
+					</div>
+				{% endif %}
+			{% endfor %}
+			<div class="author">
+				– {%if x.article.author%}
+						<a href="/author/{{x.article.author|urlencode}}">{{x.article.author}}</a>,
+					{%else%}
+						author unknown,
 					{%endif%}
-				</div>
+				<a href="/organ/{{x.article.parent.name|urlencode}}">{{x.article.parent.name}}</a>
+				<a href="{{tweet.long_url|escape}}"><img src="/Icon_External_Link.png" /></a>
+				{%if admin%}
+					<a class="admin" href="/admin/datastore/edit?key={{x.article.key}}&amp;kind=Article&amp;next={{this_page|urlencode}}">e</a>
+				{%endif%}
 			</div>
-		{% endfor %}
 		</div>
+	{% endfor %}
 	</div>
-	{% include "analytics.inc" %}
-	</body>
-</html>
+{% endblock %}
