@@ -7,6 +7,9 @@ handlers:
 - url: /
   script: toss.py
 
+- url: /timeline
+  script: toss.py
+
 - url: /author/[^/]+
   script: toss.py
 
@@ -16,7 +19,7 @@ handlers:
 - url: /organ/[^/]+
   script: toss.py
 
-- url: /timeline
+- url: /date/\d{4}-\d\d-\d\d
   script: toss.py
 
 - url: /do/update

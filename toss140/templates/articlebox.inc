@@ -1,6 +1,6 @@
 <div class="articlebox">
 	{% ifchanged article.date %}
-		<div class="date">{{article.date|date:"D jS F Y"}}</div>
+		<div class="date"><a href="/date/{{article.date}}">{{article.date|date:"D jS F Y"}}</a></div>
 	{% endifchanged %}
 	{% for tweet in article.tweets %}
 		{% include "tweet.inc" %}

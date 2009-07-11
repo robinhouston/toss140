@@ -1,7 +1,10 @@
 {% if tweet.long_url and not tweet.is_retweet %}
 	<div class="tweetbox">
-		<div class="tweet">{{tweet.text|escape}}{%if admin%}
-			<a class="admin" href="/admin/datastore/edit?key={{tweet.key}}&amp;kind=Tweet&amp;next={{this_page|urlencode}}">e</a>{%endif%}</div>
+		<div class="tweet">{{tweet.text|escape}}
+			{%if admin%}
+				<a class="admin" href="/admin/datastore/edit?key={{tweet.key}}&amp;kind=Tweet&amp;next={{this_page|urlencode}}">e</a>
+			{%endif%}
+		</div>
 		<div class="meta">
 			–&nbsp;
 			{% if front %}

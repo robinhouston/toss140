@@ -93,7 +93,7 @@ h2 {
 	float: right;
 }
 
-.date {
+.date a {
 	font-weight: bold;
 	font-size: 14px;
 	margin-top: 15px;
@@ -115,7 +115,7 @@ h2 {
 #tweets.mini {
 	font-size: 11px;
 	float: left;
-	width: 300px;
+	width: 340px;
 	padding-left: 0;
 	margin-right: 0;
 }

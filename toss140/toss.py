@@ -4,6 +4,7 @@ from google.appengine.ext.webapp import template
 from google.appengine.api import users
 from google.appengine.api import memcache
 
+import datetime
 import logging
 import os
 import re
@@ -19,6 +20,7 @@ AUTHOR_TEMPLATE    = os.path.join(os.path.dirname(__file__), 'templates', 'autho
 TWEETER_TEMPLATE   = os.path.join(os.path.dirname(__file__), 'templates', 'tweeter.tmpl')
 ORGAN_TEMPLATE     = os.path.join(os.path.dirname(__file__), 'templates', 'organ.tmpl')
 TIMELINE_TEMPLATE  = os.path.join(os.path.dirname(__file__), 'templates', 'timeline.tmpl')
+DATE_TEMPLATE      = os.path.join(os.path.dirname(__file__), 'templates', 'date.tmpl')
 
 
 def articles_by_site_name(site_name):
@@ -38,6 +40,10 @@ def tweets_by_tweeter(tweeter):
 
 def articles():
   return data.Article.all().order('-date').fetch(FETCH_SIZE)
+
+def articles_by_date(date):
+  logging.info("date = %s", str(date))
+  return data.Article.all().filter('date =', date).order("-date").fetch(FETCH_SIZE)
 
 def tweets():
   return data.Tweet.all().order("-created_at").fetch(FETCH_SIZE)
@@ -146,6 +152,25 @@ class TimelineHandler(PageHandler):
       "articles": articles(),
     }
 
+class DateHandler(PageHandler):
+  def memcache_key(self, date):
+    return "date=" + date
+
+  def template_path(self):
+    return DATE_TEMPLATE
+
+  def template_args(self, datestr):
+    mo = re.match(r'^(\d\d\d\d)-(\d\d)-(\d\d)$', datestr)
+    if not mo:
+      raise NotFound
+    date = datetime.date(*map(int, mo.groups()))
+    articles = articles_by_date(date)
+    logging.info("Found %d articles on %s", len(articles), str(date))
+    return {
+      "date":     date,
+      "articles": articles,
+    }
+
 class FrontHandler(PageHandler):
   def template_path(self):
     return FRONT_TEMPLATE
@@ -169,6 +194,7 @@ def main():
     ('/author/([^/]+)',  AuthorHandler),
     ('/tweeter/([^/]+)', TweeterHandler),
     ('/organ/([^/]+)',   OrganHandler),
+    ('/date/([^/]+)',    DateHandler),
     ('/timeline',        TimelineHandler),
   ], debug=DEBUG)
   wsgiref.handlers.CGIHandler().run(application)

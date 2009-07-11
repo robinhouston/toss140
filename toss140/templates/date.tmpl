@@ -1,0 +1,14 @@
+{% extends "master.tmpl" %}
+
+{% block title %}Articles on {{date|date:"D jS F Y"}} | toss140.net{% endblock %}
+
+{% block content %}
+	{% if logout_url %}
+		<div class="logout"><a href="{{logout_url}}">log out</a></div>
+	{% endif %}
+	<div id="articles">
+	{% for article in articles %}
+		{% include 'articlebox.inc' %}
+	{% endfor %}
+	</div>
+{% endblock %}
