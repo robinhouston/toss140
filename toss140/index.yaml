@@ -38,7 +38,7 @@ indexes:
   - name: date
     direction: desc
 
-# Used 1941 times in query history.
+# Used 1961 times in query history.
 - kind: Tweet
   properties:
   - name: article
