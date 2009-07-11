@@ -3,13 +3,13 @@
 {% block title %}{{author}} | #toss140{% endblock %}
 
 {% block content %}
-	<h1>Tweeted by {{tweeter}}</h1>
 	{% if logout_url %}
 		<div class="logout"><a href="{{logout_url}}">log out</a></div>
 	{% endif %}
 	<div id="tweets">
-	{% for tweet in tweets %}
-		{% include "tweetbox.inc" %}
-	{% endfor %}
+		<h2>Tweeted by {{tweeter}}</h2>
+		{% for tweet in tweets %}
+			{% include "tweetbox.inc" %}
+		{% endfor %}
 	</div>
 {% endblock %}

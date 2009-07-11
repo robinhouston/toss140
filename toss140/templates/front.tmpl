@@ -3,15 +3,20 @@
 {% block title %}toss140 – one-line summaries of newspaper columns{% endblock %}
 
 {% block content %}
-	<h1>toss140.net</h1>
 	{% if logout_url %}
 		<div class="logout"><a href="{{logout_url}}">log out</a></div>
 	{% endif %}
-	<div id="info">{% include "info.inc" %}</div>
-	<div id="tweets">
-	{% for tweet in recent %}
-		{% include "tweetbox.inc" %}
-	{% endfor %}
+	{% comment %}<div id="info">{% include "info.inc" %}</div>{% endcomment %}
+	<div id="articles">
+		<h2>Column timeline</h2>
+		{% for article in articles %}
+			{% include "articlebox.inc" %}
+		{% endfor %}
 	</div>
-	<div class="attribution">#toss140 conceived by @<a href="http://twitter.com/bengoldacre">bengoldacre</a> &middot; web site by @<a href="http://twitter.com/robinhouston">robinhouston</a></div>
+	<div id="tweets" class="mini">
+		<h2>Recent summaries</h2>
+		{% for tweet in tweets %}
+			{% include "tweetbox.inc" %}
+		{% endfor %}
+	</div>
 {% endblock %}

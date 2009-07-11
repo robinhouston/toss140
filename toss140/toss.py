@@ -21,47 +21,25 @@ ORGAN_TEMPLATE     = os.path.join(os.path.dirname(__file__), 'templates', 'organ
 TIMELINE_TEMPLATE  = os.path.join(os.path.dirname(__file__), 'templates', 'timeline.tmpl')
 
 
-def tweets_by_site_name(site_name):
+def articles_by_site_name(site_name):
   site = data.Site.all().filter('name =', site_name).get()
   if site is None:
     raise NotFound
-  return tweets_by_site(site)
+  return articles_by_site(site)
 
-def tweets_by_site(site):
-  articles = data.Article.all().ancestor(site).order('-date').fetch(FETCH_SIZE)
-  logging.debug("Fetched %d articles with site '%s'", len(articles), site.name)
-  tweets = []
-  for article in articles:
-    for tweet in data.Tweet.all().filter('article =', article).order('-created_at'):
-      if not tweet.is_retweet:
-        tweets.append(tweet)
-  return tweets
+def articles_by_site(site):
+  return data.Article.all().ancestor(site).order('-date').fetch(FETCH_SIZE)
 
-def tweets_by_author(author):
-  articles = data.Article.all().filter('author =', author).order('-date').fetch(FETCH_SIZE)
-  logging.debug("Fetched %d articles with author '%s'", len(articles), author)
-  tweets = []
-  for article in articles:
-    for tweet in data.Tweet.all().filter('article =', article).order('-created_at'):
-      if not tweet.is_retweet:
-        tweets.append(tweet)
-  return tweets
+def articles_by_author(author):
+  return data.Article.all().filter('author =', author).order('-date').fetch(FETCH_SIZE)
 
 def tweets_by_tweeter(tweeter):
   return data.Tweet.all().filter('from_user =', tweeter).order('-created_at').fetch(FETCH_SIZE)
 
-def tweets_grouped_by_article():
-  articles = data.Article.all().order('-date').fetch(FETCH_SIZE)
-  logging.debug("Fetched %d articles for timeline", len(articles))
-  r = []
-  for article in articles:
-    r.append({
-      "article": article,
-      "tweets":  data.Tweet.all().filter('article =', article).order('-created_at').fetch(FETCH_SIZE)
-    })
-  return r
+def articles():
+  return data.Article.all().order('-date').fetch(FETCH_SIZE)
 
-def recent_tweets():
+def tweets():
   return data.Tweet.all().order("-created_at").fetch(FETCH_SIZE)
 
 class LoginHandler(webapp.RequestHandler):
@@ -113,20 +91,6 @@ class PageHandler(webapp.RequestHandler):
     self.response.out.write(content)
     
 
-class FrontHandler(PageHandler):
-  def template_path(self):
-    return FRONT_TEMPLATE
-  
-  def memcache_key(self):
-    return "front"
-
-  def template_args(self):
-      logging.info("Rebuilding front page")
-      return {
-        "recent":   recent_tweets(),
-        "timeline": tweets_grouped_by_article(),
-      }
-
 class AuthorHandler(PageHandler):
   def memcache_key(self, author):
     return "author=" + author
@@ -137,8 +101,8 @@ class AuthorHandler(PageHandler):
   def template_args(self, author):
     author_decoded = urllib.unquote(author)
     return {
-      "author": author_decoded,
-      "tweets": tweets_by_author(author_decoded),
+      "author":   author_decoded,
+      "articles": articles_by_author(author_decoded),
     }
 
 class TweeterHandler(PageHandler):
@@ -166,8 +130,8 @@ class OrganHandler(PageHandler):
     organ_decoded = urllib.unquote(organ)
 
     return {
-      "organ": organ_decoded,
-      "tweets": tweets_by_site_name(organ_decoded),
+      "organ":    organ_decoded,
+      "articles": articles_by_site_name(organ_decoded),
     }
 
 class TimelineHandler(PageHandler):
@@ -179,8 +143,23 @@ class TimelineHandler(PageHandler):
 
   def template_args(self):
     return {
-      "list": tweets_grouped_by_article(),
+      "articles": articles(),
     }
+
+class FrontHandler(PageHandler):
+  def template_path(self):
+    return FRONT_TEMPLATE
+
+  def memcache_key(self):
+    return "front"
+
+  def template_args(self):
+      logging.info("Rebuilding front page")
+      return {
+        "tweets":   tweets(),
+        "articles": articles(),
+        "front":    True,
+      }
 
 
 def main():

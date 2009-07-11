@@ -21,6 +21,9 @@ class Article(db.Model):
   author = db.StringProperty(required=False)
   title  = db.StringProperty(required=False)
   date   = db.DateProperty  (required=False)
+  
+  def tweets(self):
+    return Tweet.all().filter('article =', self).order('-created_at')
 
 class Tweet(db.Model):
   id = db.IntegerProperty(required=True)

@@ -1,7 +1,8 @@
 body {
 	background: #333;
-	font-family: Corbel, Gill Sans, sans-serif;
-	font-size:16px;
+	font-family: 'Lucida Grande', sans-serif;
+	font-size:13px;
+	color: #333;
 }
 
 a:link, a:visited {
@@ -10,6 +11,7 @@ a:link, a:visited {
 
 a.admin {
 	font-family: Futura;
+	font-size: 16px;
 	color: orange !important;
 }
 
@@ -26,6 +28,7 @@ a.admin {
 }
 
 h1 {
+	font-family: 'Corbel', 'Gill Sans', sans-serif;
 	color: #3cf;
 	background: #fff;
 	line-height: 150%;
@@ -60,6 +63,11 @@ h1 {
 	line-height: 1.1em;
 	color: #333;
 }
+h2 {
+	font-family: 'Corbel', 'Gill Sans', sans-serif;
+	margin-top: 0;
+	margin-left: 5px;
+}
 #info h2 {
 	line-height: 1.1em;
 }
@@ -71,8 +79,8 @@ h1 {
 	padding-right: 8px;
 	margin-left: 10px;
 	border-bottom: 1px dotted #FAA;
-	margin-right: 340px;
-}
+/*	margin-right: 340px;
+*/}
 
 .meta {
 	padding-left: 20px;
@@ -87,24 +95,42 @@ h1 {
 
 .date {
 	font-weight: bold;
+	font-size: 14px;
 	margin-top: 15px;
 	margin-left: 1em;
 	color: #900;
 }
-#articles {
+#articles, #tweets {
+	float: left;
 	background: #EFF;
 	padding-left: 10px;
 	padding-top: 10px;
 	padding-bottom: 10px;
-	padding-right: 8px;
+	padding-right: 10px;
 	margin-left: 10px;
-	margin-right: 10px;
 	margin-top: 10px;
 	margin-bottom: 5px;
-	width: 600px;
+	width: 500px;
+}
+#tweets.mini {
+	font-size: 11px;
+	float: left;
+	width: 300px;
+	padding-left: 0;
+	margin-right: 0;
+}
+.mini .tweetbox {
+	margin-right: 0;
+	margin-left: 0;
+	padding-left: 0;
+}
+.mini h2 {
+	text-align: center;
+	margin-bottom: 3px;
 }
 .tweet {
 	margin-left: 2em;
+	margin-top: 3px;
 }
 
 .articlebox {
@@ -127,6 +153,7 @@ h1 {
 }
 
 .attribution {
+	clear: both;
 	position: static;
 	bottom: 10px;
 	text-align: center;

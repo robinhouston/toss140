@@ -3,25 +3,13 @@
 {% block title %}{{author}} | #toss140{% endblock %}
 
 {% block content %}
-	<h1>Articles by {{author}}</h1>
 	{% if logout_url %}
 		<div class="logout"><a href="{{logout_url}}">log out</a></div>
 	{% endif %}
 	<div id="articles">
-		{% for tweet in tweets %}
-			<div class="articlebox">
-				{%ifchanged tweet.article.date%}
-					<div class="date">{{tweet.article.date|date:"D jS F Y"}}</div>
-				{%endifchanged%}
-				<div class="tweet">
-					&quot;{{tweet.text|escape}}&quot;
-					<div class="tweeter">by @<a
-						 href="http://twitter.com/{{tweet.from_user}}/status/{{tweet.id}}">{{tweet.from_user}}</a>
-					</div>
-					– {{tweet.article.author}}, {{tweet.article.parent.name}}
-						<a href="{{tweet.long_url}}"><img src="/Icon_External_Link.png" /></a>
-				</div>
-			</div>
+		<h2>Articles by {{author}}</h2>
+		{% for article in articles %}
+			{% include 'articlebox.inc' %}
 		{% endfor %}
 	</div>
 {% endblock %}
