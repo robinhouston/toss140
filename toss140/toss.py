@@ -60,7 +60,7 @@ class PageHandler(webapp.RequestHandler):
   def get(self, *args):
     admin = self.request.get('admin')
     if admin and not users.is_current_user_admin():
-      self.redirect("/login?r=" + urllib.urlencode(self.request.uri))
+      self.redirect("/login?r=" + urllib.quote(self.request.uri))
     
     memcache_key = self.memcache_key(*args)
     if admin:

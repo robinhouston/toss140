@@ -58,7 +58,7 @@ def scrape_express(content):
   # but that seems like something they might fix, so we allow for spaces there.
   mo_date = re.search(r'<p class="date">\s*([A-Z][a-z]+ [A-Z][a-z]+ \d+),\s*(\d\d\d\d)', content)
   if mo_date:
-    r['date'] = datetime.datetime.strptime(mo_date.group(1) + mo_date.group(2), '%A %B %d %Y').date()
+    r['date'] = datetime.datetime.strptime(mo_date.group(1) + ' ' + mo_date.group(2), '%A %B %d %Y').date()
 
   mo_author = re.search(r'''By <span class="bold">([^<]+)''', content)
   if mo_author:

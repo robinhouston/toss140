@@ -166,7 +166,6 @@ def _update_stats(n, max_id):
 # @param text The HTML (or XML) source text.
 # @return The plain text, as a Unicode string, if necessary.
 # @author Fredrik Lundh (http://effbot.org/zone/re-sub.htm#unescape-html)
-
 def html_unescape(text):
   def fixup(m):
     text = m.group(0)
