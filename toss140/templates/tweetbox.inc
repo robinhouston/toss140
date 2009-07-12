@@ -13,10 +13,10 @@
 					on
 					{% if tweet.article.author %}
 						<a href="/author/{{tweet.article.author|urlencode}}">{{tweet.article.author}}</a>
-						<a href="{{tweet.long_url}}"><img src="/Icon_External_Link.png" /></a>
 					{% else %}
-						(<a href="{{tweet.long_url}}">this article</a>)
+						something from <a href="/organ/{{tweet.article.parent.name|urlencode}}">{{tweet.article.parent.name}}</a>
 					{% endif %}
+					<a href="{{tweet.long_url}}"><img src="/Icon_External_Link.png" /></a>
 				{% endif %}
 			{% else %}
 				{%if tweet.article.author %}
