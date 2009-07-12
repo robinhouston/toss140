@@ -79,17 +79,17 @@ def extract_url(raw_text):
   if mo_url:
     short_url = re.sub(r'''[.,;:"'!]$''', '', mo_url.group())
     try:
-      fh_url = urllib.urlopen(url)
+      fh_url = urllib.urlopen(short_url)
       long_url = fh_url.geturl()
-      logging.debug("%s -> %s", url, long_url)
+      logging.debug("%s -> %s", short_url, long_url)
       fh_url.close()
     except Exception, e:
-      logging.warn("Error fetching %s: %s", url, e)
+      logging.warn("Error fetching %s: %s", short_url, e)
   
   return short_url, long_url
 
 def text_from_raw_text(raw_text):
-  text = re.sub(r'#toss140', '', raw_text)
+  text = re.sub(r'#(toss140|fb)\b', '', raw_text)
   text = re.sub(r'http://\S+', '', text)
   text = re.sub(r'^\s*(@\S+\s*)?|(\s*[:-])?\s+$', '', text)
   text = re.sub(r'\s+', ' ', text)

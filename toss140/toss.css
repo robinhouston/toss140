@@ -92,6 +92,9 @@ h2 {
 .tweeter {
 	float: right;
 }
+.tau {
+	color: #999 !important;
+}
 
 .date a {
 	font-weight: bold;
