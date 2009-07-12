@@ -43,6 +43,11 @@ h1 {
 	margin-bottom: 0px;
 	border-bottom: 1px dotted black;
 }
+h1 a:visited {
+	text-decoration: none;
+	margin: 0 0 0 0;
+	color: inherit;
+}
 
 .logout {
 	position: absolute;

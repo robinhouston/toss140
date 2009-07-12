@@ -7,7 +7,7 @@
 			<a class="admin" href="/do/index-tweet?key={{tweet.key}}">r</a>
 		{%endif%}
 		<div class="tweeter">
-			<a href="/tweeter/{{tweet.from_user|urlencode}}">{{tweet.from_user}}</a>
+			<a href="/tweeter/{{tweet.from_user|urlencode}}{{q}}">{{tweet.from_user}}</a>
 			<a class="tau" href="http://twitter.com/{{tweet.from_user}}/status/{{tweet.id}}">#</a>
 		</div>
 	</div>

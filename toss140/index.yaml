@@ -31,21 +31,21 @@ indexes:
   - name: date
     direction: desc
 
-# Used 36 times in query history.
+# Used 37 times in query history.
 - kind: Article
   ancestor: yes
   properties:
   - name: date
     direction: desc
 
-# Used 2325 times in query history.
+# Used 2392 times in query history.
 - kind: Tweet
   properties:
   - name: article
   - name: created_at
     direction: desc
 
-# Used 10 times in query history.
+# Used 13 times in query history.
 - kind: Tweet
   properties:
   - name: from_user

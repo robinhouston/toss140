@@ -16,7 +16,13 @@
 </head>
 <body>
 	<div id="content">
-		<h1>toss140.net</h1>
+		<h1><a href="/{{q}}">toss140.net</a></h1>
+		{% if refresh_url %}
+			<div class="refresh"><a href="{{refresh_url}}">refresh</a></div>
+		{% endif %}
+		{% if logout_url %}
+			<div class="logout"><a href="{{logout_url}}">log out</a></div>
+		{% endif %}
 		{% block content %}{% endblock %}
 		<div class="attribution">conceived by @<a href="http://twitter.com/bengoldacre">bengoldacre</a> &middot; web site by @<a href="http://twitter.com/robinhouston">robinhouston</a></div>
 	</div>

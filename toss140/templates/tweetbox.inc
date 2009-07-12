@@ -12,19 +12,19 @@
 				{% if tweet.article %}
 					on
 					{% if tweet.article.author %}
-						<a href="/author/{{tweet.article.author|urlencode}}">{{tweet.article.author}}</a>
+						<a href="/author/{{tweet.article.author|urlencode}}{{q}}">{{tweet.article.author}}</a>
 					{% else %}
-						something from <a href="/organ/{{tweet.article.parent.name|urlencode}}">{{tweet.article.parent.name}}</a>
+						something from <a href="/organ/{{tweet.article.parent.name|urlencode}}{{q}}">{{tweet.article.parent.name}}</a>
 					{% endif %}
 					<a href="{{tweet.long_url}}"><img src="/Icon_External_Link.png" /></a>
 				{% endif %}
 			{% else %}
 				{%if tweet.article.author %}
-					<a href="/author/{{tweet.article.author|urlencode}}">{{tweet.article.author}}</a>, {%else%}from {%endif%}
-					<a href="/organ/{{tweet.article.parent.name|urlencode}}">{{tweet.article.parent.name}}{%if tweet.article.date%}, {{tweet.article.date|date:"D jS F Y"}}{%endif%}
+					<a href="/author/{{tweet.article.author|urlencode}}{{q}}">{{tweet.article.author}}</a>, {%else%}from {%endif%}
+					<a href="/organ/{{tweet.article.parent.name|urlencode}}{{q}}">{{tweet.article.parent.name}}{%if tweet.article.date%}, {{tweet.article.date|date:"D jS F Y"}}{%endif%}
 					<a href="{{tweet.long_url}}"><img src="/Icon_External_Link.png" /></a>
 			
-					<div class="tweeter"><a href="http://twitter.com/{{tweet.from_user}}/status/{{tweet.id}}">{{tweet.from_user}}</a></div>
+					<div class="tweeter"><a href="http://twitter.com/{{tweet.from_user}}/status/{{tweet.id}}{{q}}">{{tweet.from_user}}</a></div>
 				{% endif %}
 			
 				{%if admin%}

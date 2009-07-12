@@ -3,9 +3,6 @@
 {% block title %}{{author}} | toss140.net{% endblock %}
 
 {% block content %}
-	{% if logout_url %}
-		<div class="logout"><a href="{{logout_url}}">log out</a></div>
-	{% endif %}
 	<div id="articles">
 		<h2>Articles by {{author}}</h2>
 		{% for article in articles %}

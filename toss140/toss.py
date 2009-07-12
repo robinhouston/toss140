@@ -90,7 +90,10 @@ class PageHandler(webapp.RequestHandler):
       template_args['admin'] = admin
       template_args['this_page'] = self.request.uri
       if admin:
+        template_args['q'] = '?admin=1'
         template_args['logout_url'] = users.create_logout_url(self.request.uri)
+      else:
+        template_args['q'] = ''
       content = template.render(template_path, template_args)
       memcache.add(key=memcache_key, value=content, time=900)
 
