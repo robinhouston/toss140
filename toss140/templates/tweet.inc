@@ -1,6 +1,7 @@
+{# included into articlebox #}
 {% if not tweet.is_retweet %}
 	<div class="tweet">
-		&quot;{{tweet.text|escape}}&quot;
+		&ldquo;{{tweet.text|escape}}&rdquo;
 		{%if admin%}
 			<a class="admin" href="/admin/datastore/edit?key={{tweet.key}}&amp;kind=Tweet&amp;next={{this_page|urlencode}}">e</a>
 			<a class="admin" href="/do/index-tweet?key={{tweet.key}}">r</a>
