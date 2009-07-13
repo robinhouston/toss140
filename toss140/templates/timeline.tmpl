@@ -1,12 +1,13 @@
 {% extends "master.tmpl" %}
 
-{% block title %}Columnist timeline | toss140.net{% endblock %}
+{% block title %}Column timeline | toss140.net{% endblock %}
 
 {% block content %}
 	<div id="articles">
-	<h2>Columnist timeline</h2>
+	<h2>Column timeline</h2>
 	{% for article in articles %}
 		{% include 'articlebox.inc' %}
 	{% endfor %}
 	</div>
+	{% include 'infobox.inc' %}
 {% endblock %}

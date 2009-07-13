@@ -15,12 +15,18 @@ import data
 DEBUG = True
 FETCH_SIZE = 20
 
-FRONT_TEMPLATE     = os.path.join(os.path.dirname(__file__), 'templates', 'front.tmpl')
-AUTHOR_TEMPLATE    = os.path.join(os.path.dirname(__file__), 'templates', 'author.tmpl')
-TWEETER_TEMPLATE   = os.path.join(os.path.dirname(__file__), 'templates', 'tweeter.tmpl')
-ORGAN_TEMPLATE     = os.path.join(os.path.dirname(__file__), 'templates', 'organ.tmpl')
-TIMELINE_TEMPLATE  = os.path.join(os.path.dirname(__file__), 'templates', 'timeline.tmpl')
-DATE_TEMPLATE      = os.path.join(os.path.dirname(__file__), 'templates', 'date.tmpl')
+TEMPLATES = os.path.join(os.path.dirname(__file__), 'templates')
+
+FRONT_TEMPLATE     = os.path.join(TEMPLATES, 'front.tmpl')
+ABOUT_TEMPLATE     = os.path.join(TEMPLATES, 'about.tmpl')
+TIMELINE_TEMPLATE  = os.path.join(TEMPLATES, 'timeline.tmpl')
+RECENT_TEMPLATE    = os.path.join(TEMPLATES, 'recent.tmpl')
+
+AUTHOR_TEMPLATE    = os.path.join(TEMPLATES, 'author.tmpl')
+TWEETER_TEMPLATE   = os.path.join(TEMPLATES, 'tweeter.tmpl')
+ORGAN_TEMPLATE     = os.path.join(TEMPLATES, 'organ.tmpl')
+DATE_TEMPLATE      = os.path.join(TEMPLATES, 'date.tmpl')
+LINKLESS_TEMPLATE  = os.path.join(TEMPLATES, 'linkless.tmpl')
 
 
 def articles_by_site_name(site_name):
@@ -38,15 +44,27 @@ def articles_by_author(author):
 def tweets_by_tweeter(tweeter):
   return data.Tweet.all().filter('from_user =', tweeter).order('-created_at').fetch(FETCH_SIZE)
 
-def articles():
+def _articles():
   return data.Article.all().order('-date').fetch(FETCH_SIZE)
 
 def articles_by_date(date):
   logging.info("date = %s", str(date))
   return data.Article.all().filter('date =', date).order("-date").fetch(FETCH_SIZE)
 
-def tweets():
+def articles_up_to_date(date):
+  return data.Article.all().filter('date <=', date).order("-date").fetch(FETCH_SIZE)
+
+def _tweets():
   return data.Tweet.all().order("-created_at").fetch(FETCH_SIZE)
+
+def tweets_without_link():
+  return data.Tweet.all().filter("short_url =", None).order("-created_at").fetch(FETCH_SIZE)
+
+def parse_iso_date(datestr):
+  mo = re.match(r'^(\d\d\d\d)-(\d\d)-(\d\d)$', datestr)
+  if not mo:
+    raise NotFound
+  return datetime.date(*map(int, mo.groups()))
 
 class LoginHandler(webapp.RequestHandler):
   # This handler just redirects to the supplied URL.
@@ -63,7 +81,15 @@ class NotFound(Exception):
 
 class PageHandler(webapp.RequestHandler):
   '''Superclass for our page handlers.'''
+  
+  def _unquote(self, string):
+    if string is None:
+      return None
+    else:
+      return urllib.unquote(string)
+  
   def get(self, *args):
+    args = map(self._unquote, args)
     admin = self.request.get('admin')
     if admin and not users.is_current_user_admin():
       self.redirect("/login?r=" + urllib.quote(self.request.uri))
@@ -71,14 +97,19 @@ class PageHandler(webapp.RequestHandler):
     memcache_key = self.memcache_key(*args)
     if admin:
       memcache_key = 'admin:' + memcache_key
-    
+
+    # At least on the dev server, self.request.uri contains the
+    # URI of the original request, NOT of the target of the redirect,
+    # even when we're processing the target of the redirect. (A bug?)
+    uri = re.sub(r'[?&]refresh.*', '', self.request.uri)
     if self.request.get("refresh"):
       memcache.delete(memcache_key)
-      self.redirect(re.sub(r'[?&]refresh.*', '', self.request.uri))
+      self.redirect(uri)
+
 
     content = memcache.get(memcache_key)
     if content is None:
-      logging.info("Rebuilding page for " + self.request.uri)
+      logging.info("Rebuilding page for " + uri)
       template_path = self.template_path()
       try:
         template_args = self.template_args(*args)
@@ -88,17 +119,21 @@ class PageHandler(webapp.RequestHandler):
       
       template_args['debug'] = DEBUG
       template_args['admin'] = admin
-      template_args['this_page'] = self.request.uri
+      template_args['this_page'] = uri
       if admin:
         template_args['q'] = '?admin=1'
-        template_args['logout_url'] = users.create_logout_url(self.request.uri)
+        template_args['refresh_url'] = uri + '&refresh=1'
+        template_args['logout_url']  = users.create_logout_url(self.request.uri)
       else:
         template_args['q'] = ''
       content = template.render(template_path, template_args)
-      memcache.add(key=memcache_key, value=content, time=900)
+      memcache.add(key=memcache_key, value=content, time=self.memcache_time(*args))
 
     self.response.out.write(content)
-    
+  
+  def memcache_time(*args):
+    '''The default is no timeout.'''
+    return 0
 
 class AuthorHandler(PageHandler):
   def memcache_key(self, author):
@@ -108,10 +143,9 @@ class AuthorHandler(PageHandler):
     return AUTHOR_TEMPLATE
     
   def template_args(self, author):
-    author_decoded = urllib.unquote(author)
     return {
-      "author":   author_decoded,
-      "articles": articles_by_author(author_decoded),
+      "author":   author,
+      "articles": articles_by_author(author),
     }
 
 class TweeterHandler(PageHandler):
@@ -122,10 +156,9 @@ class TweeterHandler(PageHandler):
     return TWEETER_TEMPLATE
 
   def template_args(self, tweeter):
-    tweeter_decoded = urllib.unquote(tweeter)
     return {
-      "tweeter": tweeter_decoded,
-      "tweets":  tweets_by_tweeter(tweeter_decoded),
+      "tweeter": tweeter,
+      "tweets":  tweets_by_tweeter(tweeter),
     }
 
 class OrganHandler(PageHandler):
@@ -136,23 +169,52 @@ class OrganHandler(PageHandler):
     return ORGAN_TEMPLATE
 
   def template_args(self, organ):
-    organ_decoded = urllib.unquote(organ)
-
     return {
-      "organ":    organ_decoded,
-      "articles": articles_by_site_name(organ_decoded),
+      "organ":    organ,
+      "articles": articles_by_site_name(organ),
     }
 
 class TimelineHandler(PageHandler):
-  def memcache_key(self):
-    return "timeline"
+  def memcache_key(self, date):
+    if date is None:
+      return "timeline"
+    else:
+      return "timeline=" + date
+  
+  def memcache_time(self, date):
+    # Set an explicit timeout on the timeline-to-date page, because it's
+    # tricky to expire these manually when a tweet is added. (How do you
+    # know which keys are affected?)
+    if date:
+      return 900
+    else:
+      return 0
     
   def template_path(self):
     return TIMELINE_TEMPLATE
 
+  def template_args(self, datestr):
+    if datestr is None:
+      articles = _articles()
+      date = None
+    else:
+      date = parse_iso_date(datestr)
+      articles = articles_up_to_date(date)
+    return {
+      "articles": articles,
+      "date": date,
+    }
+
+class RecentHandler(PageHandler):
+  def memcache_key(self):
+    return "recent"
+
+  def template_path(self):
+    return RECENT_TEMPLATE
+
   def template_args(self):
     return {
-      "articles": articles(),
+      "tweets": _tweets(),
     }
 
 class DateHandler(PageHandler):
@@ -163,16 +225,37 @@ class DateHandler(PageHandler):
     return DATE_TEMPLATE
 
   def template_args(self, datestr):
-    mo = re.match(r'^(\d\d\d\d)-(\d\d)-(\d\d)$', datestr)
-    if not mo:
-      raise NotFound
-    date = datetime.date(*map(int, mo.groups()))
+    date = parse_iso_date(datestr)
     articles = articles_by_date(date)
     logging.info("Found %d articles on %s", len(articles), str(date))
     return {
-      "date":     date,
-      "articles": articles,
+      "date":      date,
+      "date_prev": date - datetime.timedelta(days=1),
+      "date_next": date + datetime.timedelta(days=1),
+      "articles":  articles,
     }
+
+class LinklessHandler(PageHandler):
+  def memcache_key(self):
+    return "linkless"
+
+  def template_path(self):
+    return LINKLESS_TEMPLATE
+
+  def template_args(self):
+    return {
+      "tweets": tweets_without_link(),
+    }
+
+class AboutHandler(PageHandler):
+  def template_path(self):
+    return ABOUT_TEMPLATE
+
+  def memcache_key(self):
+    return "about"
+
+  def template_args(self):
+    return {}
 
 class FrontHandler(PageHandler):
   def template_path(self):
@@ -184,21 +267,26 @@ class FrontHandler(PageHandler):
   def template_args(self):
       logging.info("Rebuilding front page")
       return {
-        "tweets":   tweets(),
-        "articles": articles(),
+        "tweets":   _tweets(),
+        "articles": _articles(),
         "front":    True,
       }
 
 
 def main():
   application = webapp.WSGIApplication([
-    ('/login',           LoginHandler),
-    ('/',                FrontHandler),
-    ('/author/([^/]+)',  AuthorHandler),
-    ('/tweeter/([^/]+)', TweeterHandler),
-    ('/organ/([^/]+)',   OrganHandler),
-    ('/date/([^/]+)',    DateHandler),
-    ('/timeline',        TimelineHandler),
+    ('/login',              LoginHandler),
+                            
+    ('/',                   FrontHandler),
+    ('/about',              AboutHandler),
+    ('/timeline(?:/(.+))?', TimelineHandler),
+    ('/recent',             RecentHandler),
+                            
+    ('/author/([^/]+)',     AuthorHandler),
+    ('/tweeter/([^/]+)',    TweeterHandler),
+    ('/organ/([^/]+)',      OrganHandler),
+    ('/date/([^/]+)',       DateHandler),
+    ('/linkless',           LinklessHandler),
   ], debug=DEBUG)
   wsgiref.handlers.CGIHandler().run(application)
 

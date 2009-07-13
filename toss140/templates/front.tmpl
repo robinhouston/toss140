@@ -1,17 +1,17 @@
 {% extends "master.tmpl" %}
 
-{% block title %}toss140 – comment on the commentators{% endblock %}
+{% block title %}toss140.net – comment on the commentators{% endblock %}
 
 {% block content %}
-	{% comment %}<div id="info">{% include "info.inc" %}</div>{% endcomment %}
+	{# <div id="info">{% include "info.inc" %}</div> #}
 	<div id="articles">
-		<h2>Column timeline</h2>
+		<h2><a href="/timeline{{q}}">Column timeline</a></h2>
 		{% for article in articles %}
 			{% include "articlebox.inc" %}
 		{% endfor %}
 	</div>
 	<div id="tweets" class="mini">
-		<h2>Recent summaries</h2>
+		<h2><a href="/recent{{q}}">Recent summaries</a></h2>
 		{% for tweet in tweets %}
 			{% include "tweetbox.inc" %}
 		{% endfor %}

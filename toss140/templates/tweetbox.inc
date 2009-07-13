@@ -16,13 +16,14 @@
 					{% else %}
 						something from <a href="/organ/{{tweet.article.parent.name|urlencode}}{{q}}">{{tweet.article.parent.name}}</a>
 					{% endif %}
-					<a href="{{tweet.long_url}}"><img src="/Icon_External_Link.png" /></a>
+					<a href="{{tweet.long_url}}"><img alt="(link)" src="/Icon_External_Link.png" /></a>
 				{% endif %}
 			{% else %}
 				{%if tweet.article.author %}
 					<a href="/author/{{tweet.article.author|urlencode}}{{q}}">{{tweet.article.author}}</a>, {%else%}from {%endif%}
-					<a href="/organ/{{tweet.article.parent.name|urlencode}}{{q}}">{{tweet.article.parent.name}}{%if tweet.article.date%}, {{tweet.article.date|date:"D jS F Y"}}{%endif%}
-					<a href="{{tweet.long_url}}"><img src="/Icon_External_Link.png" /></a>
+					<a href="/organ/{{tweet.article.parent.name|urlencode}}{{q}}">{{tweet.article.parent.name}}</a><!--
+						-->{%if tweet.article.date%}, <a href="/date/{{tweet.article.date}}{{q}}">{{tweet.article.date|date:"D jS F Y"}}</a>{%endif%}
+					<a href="{{tweet.long_url}}"><img alt="(link)" src="/Icon_External_Link.png" /></a>
 			
 					<div class="tweeter"><a href="http://twitter.com/{{tweet.from_user}}/status/{{tweet.id}}{{q}}">{{tweet.from_user}}</a></div>
 				{% endif %}

@@ -1,0 +1,24 @@
+{% extends "master.tmpl" %}
+
+{% block title %}Tweets without links | toss140.net{% endblock %}
+
+{% block content %}
+	<div id="tweets">
+		<h2>Tweets without links</h2>
+		{% for tweet in tweets %}
+		<div class="tweetbox">
+			<div class="tweet">
+				{{tweet.raw_text|escape}}
+				{%if admin%}
+					<a class="admin" href="/admin/datastore/edit?key={{tweet.key}}&amp;kind=Tweet&amp;next={{this_page|urlencode}}">e</a>
+					<a class="admin" href="/do/index-tweet?key={{tweet.key}}">r</a>
+				{%endif%}
+				<div class="tweet-date">–&nbsp;{{tweet.created_at|date:"D jS F Y, H:i:s"}}
+				<div class="tweeter"><a href="http://twitter.com/{{tweet.from_user}}/status/{{tweet.id}}{{q}}">{{tweet.from_user}}</a></div>
+				</div>
+			</div>
+		</div>
+		{% endfor %}
+	</div>
+	{% include 'infobox.inc' %}
+{% endblock %}

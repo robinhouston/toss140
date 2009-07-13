@@ -20,9 +20,9 @@ def scrape_guardian(content):
 def scrape_times(content):
   r = {}
 
-  mo_date = re.search(r'Article Published Date : ([A-Z][a-z][a-z] \d\d?, \d\d\d\d)', content)
+  mo_date = re.search(r'Article Published Date : (\d\d-[A-Z][a-z][a-z]-\d\d\d\d)', content)
   if mo_date:
-    r['date'] = datetime.datetime.strptime(mo_date.group(1), "%b %d, %Y").date()
+    r['date'] = datetime.datetime.strptime(mo_date.group(1), "%d-%b-%Y").date()
 
   mo_author = re.search(r'''Print Author name from By Line associated with the article -->\s*<span class="small"></span><span class="byline">\s*(.*)''', content)
   if mo_author:

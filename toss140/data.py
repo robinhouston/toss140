@@ -4,8 +4,9 @@ import re
 from google.appengine.ext import db
 from google.appengine.api import memcache
 
-class Stats(db.Model):
+class Origin(db.Model):
   tag = db.StringProperty(required=True, default='toss140')
+  api_url = db.LinkProperty(required=True)
   max_id = db.IntegerProperty(required=True, default=1)
   count = db.IntegerProperty(required=True, default=0)
 
@@ -40,16 +41,27 @@ class Tweet(db.Model):
   long_url = db.LinkProperty(required=False)
   is_retweet = db.BooleanProperty(required=True, default=False)
 
+  origin = db.ReferenceProperty(required=False, reference_class=Origin)
   article = db.ReferenceProperty(required=False, reference_class=Article, default=None)
 
 
-_STATS_KEY = db.Key.from_path('Stats', 'toss140')
-
-def get_stats():
-  stats = Stats.get(_STATS_KEY)
-  if not stats:
-    stats = Stats(key_name='toss140')
-  return stats
+def get_origins():
+  origins = Origin.all().fetch(16)
+  if origins:
+    return origins
+  twitter_origin = Origin(
+    key_name='twitter#toss140',
+    api_url='http://search.twitter.com/',
+    max_id=2597007905,
+    count=Tweet.all().count(),
+  )
+  twitter_origin.put()
+  identica_origin = Origin(
+    key_name='identica#toss140',
+    api_url='http://identi.ca/api/',
+  )
+  identica_origin.put()
+  return [twitter_origin, identica_origin]
 
 def get_site(hostname):
   site = Site.get_by_key_name(hostname)
@@ -61,5 +73,5 @@ def get_site(hostname):
 def get_site_name(hostname):
   # It's hard to get the name from the site itself, because different sites format
   # the <title> of the front page in a bewildering variety of different ways. Just
-  # fake the name up from the URL, and expect it will be edited.
+  # fake the name up from the URL, and expect it will be edited by hand.
   return re.sub(r'^www\.', '', hostname)

@@ -7,7 +7,13 @@ handlers:
 - url: /
   script: toss.py
 
-- url: /timeline
+- url: /about
+  script: toss.py
+
+- url: /timeline(/\d{4}-\d\d-\d\d)?
+  script: toss.py
+
+- url: /recent(/\d{4}-\d\d-\d\d)?
   script: toss.py
 
 - url: /author/[^/]+
@@ -20,6 +26,9 @@ handlers:
   script: toss.py
 
 - url: /date/\d{4}-\d\d-\d\d
+  script: toss.py
+
+- url: /linkless
   script: toss.py
 
 - url: /do/update

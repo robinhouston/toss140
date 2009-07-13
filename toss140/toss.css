@@ -8,6 +8,7 @@ body {
 a:link, a:visited {
 	text-decoration: none; color: #668;
 }
+a img {border: none; }
 
 a.admin {
 	font-family: Futura;
@@ -43,19 +44,32 @@ h1 {
 	margin-bottom: 0px;
 	border-bottom: 1px dotted black;
 }
-h1 a:visited {
-	text-decoration: none;
+h1 a:visited, h1 a:link {
 	margin: 0 0 0 0;
 	color: inherit;
 }
 
-.logout {
+#menu {
 	position: absolute;
-	top: 10px;
-	right: 30px;
+	top: 1.5em;
+	right: 2em;
+}
+.menu-item {
+	margin-right: 6px;
 }
 
+#what {
+	position: absolute;
+	font-family: 'Corbel', 'Gill Sans', sans-serif;
+	top: 16px;
+	right: 16em;
+	padding: 1px 3px 1px 3px;
+	color: white; background: #3cf;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+}
 #info {
+	display: none;
 	position: absolute;
 	width: 300px;
 	right: 10px;
@@ -73,6 +87,9 @@ h2 {
 	margin-top: 0;
 	margin-left: 5px;
 }
+h2 a:visited, h2 a:link {
+	color: inherit;
+}
 #info h2 {
 	line-height: 1.1em;
 }
@@ -84,8 +101,13 @@ h2 {
 	padding-right: 8px;
 	margin-left: 10px;
 	border-bottom: 1px dotted #FAA;
-/*	margin-right: 340px;
-*/}
+}
+
+.tweet-date {
+	margin-top: 5px;
+	margin-bottom: 3px;
+	color: #666;
+}
 
 .meta {
 	padding-left: 20px;
@@ -108,8 +130,9 @@ h2 {
 	margin-left: 1em;
 	color: #900;
 }
-#articles, #tweets {
+#articles, #tweets, #about, #infobox {
 	float: left;
+	display: inline; /* workaround for E6 rendering bug, ignore by proper browsers */
 	background: #EFF;
 	padding-left: 10px;
 	padding-top: 10px;
@@ -120,12 +143,23 @@ h2 {
 	margin-bottom: 5px;
 	width: 500px;
 }
-#tweets.mini {
+#about h2 {
+	color: #3cf;
+	text-align: center;
+}
+#tweets.mini, #infobox.mini {
 	font-size: 11px;
 	float: left;
-	width: 340px;
+	display: inline; /* workaround for E6 rendering bug, ignore by proper browsers */
+	width: 330px;
 	padding-left: 0;
 	margin-right: 0;
+}
+#infobox {
+	color: #666;
+}
+#infobox p {
+	margin-left: 6px;
 }
 .mini .tweetbox {
 	margin-right: 0;

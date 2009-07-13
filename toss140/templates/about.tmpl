@@ -1,0 +1,46 @@
+{% extends "master.tmpl" %}
+
+{% block title %}toss140.net – about the site{% endblock %}
+
+{% block content %}
+	<div id="about">
+		<h2>About this site</h2>
+		
+		<h3>What is this?</h3>
+		<p>toss140.net is a crowdsourced summary of newspaper columnists, so you can be on top of the pundits, and decide if you want to read them.</p>
+
+		<h3>How do I write a summary?</h3>
+		<p>Just twitter your summary, and include a link to the piece you're summarising (shortened is fine, we are very clever). As long as you include the hashtag <code>#toss140</code>, we will find your tweet and the website will do the rest, deducing the author name, the newspaper title, the date, etc.</p>
+		
+		<h3>But I'm a free software zealot. I can't use Twitter!</h3>
+		<p>It works with <a href="http://identi.ca">identi.ca</a> as well, especially for you.</p>
+				
+		<h3>I posted a summary, but it hasn't shown up?</h3>
+		<p>
+			There's a short delay (about 5 minutes) before new posts appear on the site.
+			If you didn't link to the article you're summarising, then it won't appear
+			on the main site. You can look <a href="/linkless">here</a> to see all the
+			posts we couldn't find links for.
+			(Of course if your post was blatant spam, then we've probably deleted it.)
+		</p>
+		
+		<h3>My summary appears in &ldquo;Recent Summaries&rdquo;, but I can't find it
+			in the Column timeline?</h3>
+		<p>To capture the author and date, we screen-scrape the web page that
+			you linked to. This has to be done differently for each site, so at the moment
+			it only works for a handful of sites (the major UK newspapers, principally).
+			We're adding new ones all the time though, so try checking back in a few
+			days.</p>
+
+		<h3>Is the code available?</h3>
+		<p>
+			Of course. It's <a href="http://github.com/robinhouston/toss140">here, on GitHub</a>.
+			If you want to contribute, please <a href="mailto:dev@toss140.net">get in touch</a>.
+		</p>
+		
+		<h3>Anything else?</h3>
+		<p>If you have any other questions, or comments, write to us at
+			<a href="mailto:contact@toss140.net">contact@toss140.net</a>.</p>
+	</div>
+	{% include 'infobox.inc' %}
+{% endblock %}

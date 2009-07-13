@@ -6,6 +6,7 @@ import urllib
 
 import dateutil.parser
 from django.utils import simplejson
+from google.appengine.api import memcache
 from google.appengine.api.labs import taskqueue
 from google.appengine.ext import db
 from google.appengine.ext import webapp
@@ -24,10 +25,8 @@ except ImportError:
   from google.appengine.runtime.apiproxy_errors import DeadlineExceededError 
 
 
-def new_tweets():
-  global _stats, _n, _max_id
-  _stats = data.get_stats()
-  url = 'http://search.twitter.com/search.json?q=%23toss140&rpp=100&since_id=' + str(_stats.max_id)
+def new_tweets_from_origin(origin):
+  url = origin.api_url + 'search.json?q=%23toss140&rpp=100&since_id=' + str(origin.max_id)
   results = []
   while 1:
     logging.info("Fetching URL: %s", url)
@@ -36,10 +35,7 @@ def new_tweets():
     results.extend(raw_result["results"])
     if 'next_page' not in raw_result:
       break
-    url = 'search.twitter.com/search.json' + raw_result['next_page']
-
-  _n = len(results)
-  _stats.max_id = raw_result["max_id"]
+    url = api_url + 'search.json' + raw_result['next_page']
 
   return results
 
@@ -64,6 +60,7 @@ def store_tweet(tweet):
     to_user_id = to_user_id,
     iso_language_code = tweet['iso_language_code'],
     source = html_unescape(tweet['source']),
+    origin = data.Origin.get(tweet['origin_key']),
     raw_text = raw_text,
     text = '-', # Filled in by the index(t) call below
     short_url = short_url,
@@ -144,21 +141,39 @@ def article(fh):
 
   return article
 
+def refresh_caches(tweet):
+  '''Clear any cached pages that have changed as a result of the addition of this tweet.'''
+  memcache.delete("front")
+  memcache.delete("timeline")
+  memcache.delete("recent")
+  
+  memcache.delete("tweeter=" + tweet.from_user)
+  
+  if tweet.short_url is None:
+    memcache.delete("linkless")
+  
+  if tweet.article:
+    memcache.delete("organ="  + tweet.article.parent().name)
+    if tweet.article.author:
+      memcache.delete("author=" + tweet.article.author)
+    if tweet.article.date:
+      memcache.delete("date="   + str(tweet.article.date))
 
-def update_stats(n, max_id):
-  db.run_in_transaction(_update_stats, n=n, max_id=max_id)
+def update_stats(origin, n, max_id):
+  db.run_in_transaction(_update_stats, origin_key=origin.key(), n=n, max_id=max_id)
 
-def _update_stats(n, max_id):
+def _update_stats(origin_key, n, max_id):
   logging.debug("Updating stats: n=%d, max_id=%d", n, max_id)
 
-  stats = data.get_stats()
-  stats.count += n
-  if max_id > stats.max_id:
-    stats.max_id = max_id
+  origin = data.Origin.get(origin_key)
+  origin.count += n
+  if max_id > origin.max_id:
+    origin.max_id = max_id
   else:
-    logging.warn("New max_id (%d) is no larger than existing (%d)", max_id, stats.max_id)
+    logging.warn("New max_id (%d) is no larger than existing (%d) for %s",
+      max_id, origin.max_id, origin_key.name())
 
-  stats.put()
+  origin.put()
 
 ##
 # Removes HTML or XML character references and entities from a text string.
@@ -190,23 +205,34 @@ def html_unescape(text):
 
 
 class UpdateHandler(webapp.RequestHandler):
+  '''Called periodically to fetch new summaries from twitter (etc.)
   
+  Each new summary is placed into the 'add-tweet' task queue, and the
+  AddTweetHandler is then called separately for each one.
+  '''
   _queue   = taskqueue.Queue(name='add-tweet')
   
   def get(self):
-    tweets = new_tweets()
-    max_id = 1
-    for tweet in tweets:
-      if tweet['id'] > max_id:
-        max_id = tweet['id']
-      task = taskqueue.Task(url='/do/add-tweet', countdown=0, method='POST', params=tweet)
-      self._queue.add(task)
+    self.response.headers['Content-type'] = 'text/plain';
+    for origin in data.get_origins():
+      tweets = new_tweets_from_origin(origin)
+      max_id = 1
+      for tweet in tweets:
+        tweet['origin_key'] = origin.key()
+        if tweet['id'] > max_id:
+          max_id = tweet['id']
+        task = taskqueue.Task(url='/do/add-tweet', countdown=0, method='POST', params=tweet)
+        self._queue.add(task)
     
-    stats = {"n": len(tweets), "max_id": max_id}
-    if stats['n'] > 0:
-      update_stats(**stats)
-  
-    self.response.out.write("Queued %d tweets\n" % stats['n'])
+      if len(tweets) > 0:
+        update_stats(origin, n=len(tweets), max_id=max_id)
+      
+      message = "Queued %d tweets from %s" % (len(tweets), origin.key().name())
+      if len(tweets) > 0:
+        logging.info(message)
+      else:
+        logging.debug(message)
+      self.response.out.write(message + "\n")
 
 class AddTweetHandler(webapp.RequestHandler):
   def post(self):
@@ -231,6 +257,7 @@ class IndexTweetHandler(webapp.RequestHandler):
     tweet = data.Tweet.get(key)
     index(tweet)
     tweet.put()
+    refresh_caches(tweet)
   
   def get(self):
     self.post()
@@ -245,8 +272,8 @@ class IndexTweetHandler(webapp.RequestHandler):
 
 def main():
   application = webapp.WSGIApplication([
-    ('/do/update', UpdateHandler),
-    ('/do/add-tweet', AddTweetHandler),
+    ('/do/update',       UpdateHandler),
+    ('/do/add-tweet',    AddTweetHandler),
     ('/do/index-tweets', IndexTweetsHandler),
     ('/do/index-tweet',  IndexTweetHandler),
   ], debug=True)
