@@ -10,13 +10,7 @@
 		{% endfor %}
 	{% else %}
 	<p>
-		{% if date_prev %}
-			<a href="/date/{{date_prev}}{{q}}">←</a>
-		{% endif %}
 		No articles found for {{date|date:"D jS F Y"}}.
-		{% if date_next %}
-			<a href="/date/{{date_next}}{{q}}">→</a>
-		{% endif %}
 		</p>
 	{% endif %}
 	</div>

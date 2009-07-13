@@ -14,6 +14,7 @@ import wsgiref.handlers
 
 import data
 import screenscrapers
+import toss # FIXME only needed for date_before and date_after: move them to data?
 
 
 # DeadlineExceededError can live in two different places 
@@ -110,6 +111,7 @@ def index(tweet):
       fh_url.close()
 
   tweet.put()
+  refresh_caches(tweet)
 
 def article(fh):
   url = fh.geturl()
@@ -141,23 +143,38 @@ def article(fh):
 
   return article
 
+def clear_cache(key, value=None):
+  if value is None:
+    memcache_key = key
+  else:
+    memcache_key = key + '=' + value
+  logging.debug("Clearing memcache key '%s'", memcache_key)
+  memcache.delete(memcache_key)
+  memcache.delete('admin:' + memcache_key)
+
 def refresh_caches(tweet):
   '''Clear any cached pages that have changed as a result of the addition of this tweet.'''
-  memcache.delete("front")
-  memcache.delete("timeline")
-  memcache.delete("recent")
+  clear_cache("front")
+  clear_cache("timeline")
+  clear_cache("recent")
   
-  memcache.delete("tweeter=" + tweet.from_user)
+  clear_cache("tweeter", tweet.from_user)
   
   if tweet.short_url is None:
-    memcache.delete("linkless")
+    clear_cache("linkless")
   
   if tweet.article:
-    memcache.delete("organ="  + tweet.article.parent().name)
+    clear_cache("organ", tweet.article.parent().name)
     if tweet.article.author:
-      memcache.delete("author=" + tweet.article.author)
+      clear_cache("author", tweet.article.author)
     if tweet.article.date:
-      memcache.delete("date="   + str(tweet.article.date))
+      clear_cache("date", str(tweet.article.date))
+      date_before = toss.date_before(tweet.article.date)
+      if date_before is not None:
+        clear_cache("date", str(date_before))
+      date_after = toss.date_after(tweet.article.date)
+      if date_after is not None:
+        clear_cache("date", str(date_after))
 
 def update_stats(origin, n, max_id):
   db.run_in_transaction(_update_stats, origin_key=origin.key(), n=n, max_id=max_id)
@@ -256,8 +273,6 @@ class IndexTweetHandler(webapp.RequestHandler):
     key = self.request.get("key")
     tweet = data.Tweet.get(key)
     index(tweet)
-    tweet.put()
-    refresh_caches(tweet)
   
   def get(self):
     self.post()

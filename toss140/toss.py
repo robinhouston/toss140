@@ -54,6 +54,20 @@ def articles_by_date(date):
 def articles_up_to_date(date):
   return data.Article.all().filter('date <=', date).order("-date").fetch(FETCH_SIZE)
 
+def date_before(date):
+  article_before = data.Article.all().filter('date <', date).order("-date").get()
+  if article_before is None:
+    return None
+  else:
+    return article_before.date
+
+def date_after(date):
+  article_after = data.Article.all().filter('date >', date).order("date").get()
+  if article_after is None:
+    return None
+  else:
+    return article_after.date
+
 def _tweets():
   return data.Tweet.all().order("-created_at").fetch(FETCH_SIZE)
 
@@ -230,8 +244,8 @@ class DateHandler(PageHandler):
     logging.info("Found %d articles on %s", len(articles), str(date))
     return {
       "date":      date,
-      "date_prev": date - datetime.timedelta(days=1),
-      "date_next": date + datetime.timedelta(days=1),
+      "date_prev": date_before(date),
+      "date_next": date_after(date),
       "articles":  articles,
     }
 
