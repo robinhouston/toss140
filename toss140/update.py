@@ -2,6 +2,7 @@ import htmlentitydefs
 import logging
 import os
 import re
+import traceback
 import urllib
 
 import dateutil.parser
@@ -232,7 +233,12 @@ class UpdateHandler(webapp.RequestHandler):
   def get(self):
     self.response.headers['Content-type'] = 'text/plain';
     for origin in data.get_origins():
-      tweets = new_tweets_from_origin(origin)
+      try:
+        tweets = new_tweets_from_origin(origin)
+      except Exception:
+        logging.error("Failed to fetch updates from %s: %s", origin.key().name(), traceback.format_exc())
+        continue
+
       max_id = 1
       for tweet in tweets:
         tweet['origin_key'] = origin.key()
