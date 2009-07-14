@@ -32,8 +32,10 @@ h1 {
 	font-family: 'Corbel', 'Gill Sans', sans-serif;
 	color: #3cf;
 	background: #fff;
+	font-size: 36pt;
+	text-align: left;
 	line-height: 150%;
-	padding-left: 20px;
+	padding-left: 2em;
 	
 	-moz-border-radius-topright: 5px;
 	-moz-border-radius-topleft: 5px;
@@ -48,14 +50,26 @@ h1 a:visited, h1 a:link {
 	margin: 0 0 0 0;
 	color: inherit;
 }
+p, h3 {
+	line-height: 130%;
+}
+h3 {
+	color: #900;
+}
 
 #menu {
 	position: absolute;
-	top: 1.5em;
+	top: 26pt;
 	right: 2em;
 }
 .menu-item {
+	font-family: 'Corbel', 'Gill Sans', sans-serif;
+	color: red;
+	font-size: 18pt;
 	margin-right: 6px;
+}
+.menu-item a:link, .menu-item a:visited {
+	color: inherit;
 }
 
 #what {
@@ -190,7 +204,9 @@ h2 a:visited, h2 a:link {
 }
 .author {
 	margin-left: 1em;
+	margin-right: 0.5em;
 	margin-top: 3px;
+	text-align: right;
 	color: #666;
 }
 
