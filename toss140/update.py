@@ -28,7 +28,7 @@ except ImportError:
 
 
 def new_tweets_from_origin(origin):
-  url = origin.api_url + 'search.json?q=%23toss140&rpp=100&since_id=' + str(origin.max_id)
+  url = origin.api_url + 'search.json?q=%23' + origin.tag + '&rpp=100&since_id=' + str(origin.max_id)
   results = []
   while 1:
     logging.info("Fetching URL: %s", url)
@@ -44,7 +44,7 @@ def new_tweets_from_origin(origin):
 def store_tweet(tweet):
   logging.info("Storing tweet: %s", tweet)
   raw_text = html_unescape(tweet['text'])
-  short_url, long_url = extract_url(raw_text)
+  short_url = extract_url(raw_text)
   twid = long(tweet['id'])
   to_user_id = None
   try:
@@ -66,26 +66,17 @@ def store_tweet(tweet):
     raw_text = raw_text,
     text = '-', # Filled in by the index(t) call below
     short_url = short_url,
-    long_url  = long_url,
+    long_url  = short_url, # Replaced by index(t)
     is_retweet = False,
   )
   index(t)
 
 def extract_url(raw_text):
-  short_url, long_url = None, None
-
   mo_url = re.search(r'http://\S+', raw_text)
   if mo_url:
-    short_url = re.sub(r'''[.,;:"'!]$''', '', mo_url.group())
-    try:
-      fh_url = urllib.urlopen(short_url)
-      long_url = fh_url.geturl()
-      logging.debug("%s -> %s", short_url, long_url)
-      fh_url.close()
-    except Exception, e:
-      logging.warn("Error fetching %s: %s", short_url, e)
-  
-  return short_url, long_url
+    return re.sub(r'''[.,;:"'!]$''', '', mo_url.group())
+  else:
+    return None
 
 def text_from_raw_text(raw_text):
   text = re.sub(r'#(toss140|fb)\b', '', raw_text)
@@ -100,16 +91,11 @@ def index(tweet):
   tweet.text = text_from_raw_text(tweet.raw_text)
   tweet.is_retweet = bool(re.search(r'(?i)\bRT\b|\(via @', tweet.text))
   
-  if tweet.long_url is not None:
-    fh_url = None
-    try:
-      fh_url = urllib.urlopen(tweet.long_url)
-    except Exception, e:
-      logging.warn("Error indexing %s: %s", tweet.long_url, e)
-
-    if fh_url:
-      tweet.article = article(fh_url)
-      fh_url.close()
+  if tweet.short_url is not None:
+    fh_url = urllib.urlopen(tweet.short_url)
+    tweet.long_url = fh_url.geturl()
+    tweet.article = article(fh_url)
+    fh_url.close()
 
   tweet.put()
   refresh_caches(tweet)
@@ -241,6 +227,9 @@ class UpdateHandler(webapp.RequestHandler):
 
       max_id = 1
       for tweet in tweets:
+        if tweet['id'] < origin.max_id:
+          logging.warn("Found tweet with id %d, less than since_id %d" % (tweet['id'], origin.max_id))
+          continue
         tweet['origin_key'] = origin.key()
         if tweet['id'] > max_id:
           max_id = tweet['id']
