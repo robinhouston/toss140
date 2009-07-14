@@ -72,7 +72,7 @@ def _tweets():
   return data.Tweet.all().order("-created_at").fetch(FETCH_SIZE)
 
 def tweets_without_link():
-  return data.Tweet.all().filter("short_url =", None).order("-created_at").fetch(FETCH_SIZE)
+  return data.Tweet.all().filter("long_url =", None).order("-created_at").fetch(FETCH_SIZE)
 
 def parse_iso_date(datestr):
   mo = re.match(r'^(\d\d\d\d)-(\d\d)-(\d\d)$', datestr)
