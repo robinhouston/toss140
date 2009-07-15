@@ -5,15 +5,14 @@
 {% block content %}
 	{# <div id="info">{% include "info.inc" %}</div> #}
 	<div id="articles">
-		<h2><a href="/timeline{{q}}">Column timeline</a></h2>
+		<h2><a href="/timeline{{q}}">Summaries of recent articles</a></h2>
 		{% for article in articles %}
 			{% include "articlebox.inc" %}
 		{% endfor %}
 	</div>
-	<div id="tweets" class="mini">
-		<h2><a href="/recent{{q}}">Recent summaries</a></h2>
-		{% for tweet in tweets %}
-			{% include "tweetbox.inc" %}
-		{% endfor %}
+	<div id="infobox" class="mini">
+		<h2><a href="/recent{{q}}">About toss140.net</a></h2>
+		<p>
+		</p>
 	</div>
 {% endblock %}

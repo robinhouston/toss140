@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<rss version="2.0">
+	<channel>
+		<title>toss140.net</title>
+		<link>http://www.toss140.net/</link>
+		<description>one-line summaries of newspaper columnists, written by you.</description>
+		<language>en-gb</language>
+		<lastBuildDate>{{now|"D, d M Y H:i:s T"}}</lastBuildDate>
+		<docs>http://blogs.law.harvard.edu/tech/rss</docs>
+		<webMaster>webmaster@toss140.net</webMaster>
+		
+		{% for tweet in tweets %}
+			<item>
+				<title></title>
+				<link></link>
+				<description></description>
+				<pubDate></pubDate>
+				<guid>{{ tweet.key().name() }}</guid>
+			</item>
+		{% endfor %}
+	</channel>
+</rss>

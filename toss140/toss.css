@@ -103,6 +103,7 @@ h2 {
 	font-family: 'Gill Sans', 'Corbel', sans-serif;
 	margin-top: 0;
 	margin-left: 5px;
+	text-align: center;
 }
 h2 a:visited, h2 a:link {
 	color: inherit;
@@ -145,7 +146,7 @@ h2 a:visited, h2 a:link {
 	font-size: 14px;
 	margin-top: 15px;
 	margin-left: 1em;
-	color: #900;
+	color: #666;
 }
 #articles, #tweets, #about, #infobox {
 	float: left;
@@ -191,6 +192,9 @@ h2 a:visited, h2 a:link {
 	margin-left: 2em;
 	margin-top: 3px;
 }
+.tweet a:link, .tweet a:visited {
+	color: inherit;
+}
 
 .articlebox {
 	margin-bottom: 10px;
@@ -211,7 +215,12 @@ h2 a:visited, h2 a:link {
 	margin-top: 3px;
 	margin-bottom: 6px;
 	text-align: right;
-	color: #666;
+}
+.author .link-author {
+	color: #009;
+}
+.author .link-organ {
+	color: #900;
 }
 
 .attribution {

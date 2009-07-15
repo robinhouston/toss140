@@ -74,7 +74,10 @@ def store_tweet(tweet):
 def extract_url(raw_text):
   mo_url = re.search(r'http://\S+', raw_text)
   if mo_url:
-    return re.sub(r'''[.,;:"'!]$''', '', mo_url.group())
+    url = re.sub(r'''[.,;:"'!]$''', '', mo_url.group())
+    if re.match(r'http://(www\.)?toss140\.net', url):
+      return None
+    return url
   else:
     return None
 
