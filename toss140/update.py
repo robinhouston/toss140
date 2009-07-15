@@ -112,7 +112,7 @@ def article(fh):
     site = data.get_site(host)
     title = None
 
-    content = fh.read(32767)
+    content = fh.read(32767).decode('utf-8')
     mo = re.search(r'(?s)<title>(.*?)</title>', content)
     if mo:
       title = mo.group(1)
