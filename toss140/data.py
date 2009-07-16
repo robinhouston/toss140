@@ -41,7 +41,7 @@ class Tweet(db.Model):
   long_url = db.LinkProperty(required=False)
   is_retweet = db.BooleanProperty(required=True, default=False)
 
-  origin = db.ReferenceProperty(required=False, reference_class=Origin)
+  origin = db.ReferenceProperty(required=True, reference_class=Origin)
   article = db.ReferenceProperty(required=False, reference_class=Article, default=None)
 
 
