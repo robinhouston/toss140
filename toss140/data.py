@@ -10,6 +10,11 @@ class Origin(db.Model):
   max_id = db.IntegerProperty(required=True, default=1)
   count = db.IntegerProperty(required=True, default=0)
 
+class Destination(db.Model):
+  api_url = db.LinkProperty(required=True, default='http://twitter.com/statuses/update')
+  username = db.StringProperty(required=True, default='toss140')
+  password = db.StringProperty(required=False, default='')
+
 # The key name is the hostname of the web site
 class Site(db.Model):
   host = db.StringProperty(required=True)

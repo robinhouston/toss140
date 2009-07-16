@@ -289,6 +289,7 @@ def main():
     ('/do/add-tweet',    AddTweetHandler),
     ('/do/index-tweets', IndexTweetsHandler),
     ('/do/index-tweet',  IndexTweetHandler),
+    ('/do/reweet',       ReTweetHandler),
   ], debug=True)
   wsgiref.handlers.CGIHandler().run(application)
 

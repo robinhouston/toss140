@@ -40,10 +40,14 @@ handlers:
 
 - url: /do/index-tweets
   script: update.py
+  login: admin # Not really used at all any more. Could be useful on rare occasions
 
 - url: /do/index-tweet
   script: update.py
-  login: admin # Invoked only by task queue
+  login: admin # Invoked by task queue and 'r' link from god mode
+
+- url: /do/retweet
+  script: update.py
 
 - url: /(toss\.css)
   static_files: \1
