@@ -29,6 +29,27 @@ class OriginExporter(bulkloader.Exporter):
       ])
 
 
+class DestinationLoader(bulkloader.Loader):
+  def __init__(self):
+    bulkloader.Loader.__init__(self, 'Destination',
+      [
+        ('api_url', str),
+        ('username', str),
+        ('password', str),
+      ])
+  def generate_key(self, i, values):
+    return values[1] + '#' + values[0]
+
+class DestinationExporter(bulkloader.Exporter):
+  def __init__(self):
+    bulkloader.Exporter.__init__(self, 'Destination',
+      [
+        ('api_url',  str, None),
+        ('username', str, None),
+        ('password', str, None),
+      ])
+
+
 class SiteLoader(bulkloader.Loader):
   def __init__(self):
     bulkloader.Loader.__init__(self, 'Site',
@@ -201,8 +222,8 @@ def load_article(x):
 def export_article(x):
   return x.url
 
-loaders   = [ OriginLoader,   SiteLoader,   ArticleLoader,   TweetLoader   ]
-exporters = [ OriginExporter, SiteExporter, ArticleExporter, TweetExporter ]
+loaders   = [ OriginLoader,   DestinationLoader,   SiteLoader,   ArticleLoader,   TweetLoader   ]
+exporters = [ OriginExporter, DestinationExporter, SiteExporter, ArticleExporter, TweetExporter ]
 
 
 # env PYTHONPATH=toss140 appcfg.py download_data --config_file=toss140/loader.py \

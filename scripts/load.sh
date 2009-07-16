@@ -15,7 +15,7 @@ fi
 
 export PYTHONPATH=toss140
 
-for entity in Origin Site Article Tweet; do
+for entity in Origin Destination Site Article Tweet; do
 	appcfg.py ${1}load_data --config_file=toss140/loader.py \
 	  --filename=data/$entity.csv --kind=$entity \
 	  --url=http://${2}/remote_api \

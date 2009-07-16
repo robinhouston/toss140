@@ -11,9 +11,12 @@ class Origin(db.Model):
   count = db.IntegerProperty(required=True, default=0)
 
 class Destination(db.Model):
-  api_url = db.LinkProperty(required=True, default='http://twitter.com/statuses/update')
+  api_url = db.LinkProperty(required=True, default='http://twitter.com/statuses/update.json')
   username = db.StringProperty(required=True, default='toss140')
   password = db.StringProperty(required=False, default='')
+  
+  def url_with_auth(self):
+    return self.api_url.replace('://', '://%s:%s@' % (self.username, self.password), 1)
 
 # The key name is the hostname of the web site
 class Site(db.Model):

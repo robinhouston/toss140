@@ -15,7 +15,7 @@ import wsgiref.handlers
 
 import data
 import screenscrapers
-import toss # FIXME only needed for date_before and date_after: move them to data?
+import toss # FIXME only needed for date_before, date_after and VERSION: move them to data?
 
 
 # DeadlineExceededError can live in two different places 
@@ -70,6 +70,7 @@ def store_tweet(tweet):
     is_retweet = False,
   )
   index(t)
+  return t
 
 def extract_url(raw_text):
   mo_url = re.search(r'http://\S+', raw_text)
@@ -138,6 +139,7 @@ def clear_cache(key, value=None):
     memcache_key = key
   else:
     memcache_key = key + '=' + value
+  memcache_key = 'v' + toss.VERSION + ':' + memcache_key
   logging.debug("Clearing memcache key '%s'", memcache_key)
   memcache.delete(memcache_key)
   memcache.delete('admin:' + memcache_key)
@@ -250,12 +252,20 @@ class UpdateHandler(webapp.RequestHandler):
       self.response.out.write(message + "\n")
 
 class AddTweetHandler(webapp.RequestHandler):
+  _queue   = taskqueue.Queue(name='retweet')
+
   def post(self):
     tweet = {}
     for k, v in self.request.params.iteritems():
       tweet[str(k)] = unicode(v)
     logging.debug("add-tweet: storing %s", tweet)
-    store_tweet(tweet)
+    stored_tweet = store_tweet(tweet)
+    
+    task = taskqueue.Task(
+      url='/do/retweet', countdown=0, method='POST',
+      params={'key': stored_tweet.key()}
+    )
+    self._queue.add(task)
 
 class IndexTweetsHandler(webapp.RequestHandler):
   
@@ -283,13 +293,26 @@ class IndexTweetHandler(webapp.RequestHandler):
     else:
       self.redirect('/?refresh=1')
 
+class ReTweetHandler(webapp.RequestHandler):
+  def post(self):
+    key = self.request.get("key")
+    tweet = data.Tweet.get(key)
+    status = re.sub(r'#toss140', '', tweet.raw_text)
+    status = re.sub(r' +', ' ', status)
+    status = status[: 138 - len(tweet.from_user)] + ' @' + tweet.from_user
+    post_data = urllib.urlencode({"status": status, "in_reply_to_status_id": tweet.id})
+    for destination in data.Destination.all():
+      fh = urllib.urlopen(destination.url_with_auth(), post_data)
+      logging.debug(fh.read())
+      fh.close()
+
 def main():
   application = webapp.WSGIApplication([
     ('/do/update',       UpdateHandler),
     ('/do/add-tweet',    AddTweetHandler),
     ('/do/index-tweets', IndexTweetsHandler),
     ('/do/index-tweet',  IndexTweetHandler),
-    ('/do/reweet',       ReTweetHandler),
+    ('/do/retweet',      ReTweetHandler),
   ], debug=True)
   wsgiref.handlers.CGIHandler().run(application)
 
