@@ -23,6 +23,10 @@ def scrape_times(content):
   mo_date = re.search(r'Article Published Date : (\d\d-[A-Z][a-z][a-z]-\d\d\d\d)', content)
   if mo_date:
     r['date'] = datetime.datetime.strptime(mo_date.group(1), "%d-%b-%Y").date()
+  else:
+    mo_date = re.search(r'Article Published Date : ([A-Z][a-z][a-z] \d\d?, \d\d\d\d)', content)
+    if mo_date:
+      r['date'] = datetime.datetime.strptime(mo_date.group(1), "%b %d, %Y").date()
 
   mo_author = re.search(r'''Print Author name from By Line associated with the article -->\s*<span class="small"></span><span class="byline">\s*(.*)''', content)
   if mo_author:
@@ -124,6 +128,24 @@ def scrape_telegraph(content):
 
   return r
 
+def scrape_newscientist(content):
+  r = {}
+
+  mo_author = re.search(r'<meta name="rbauthors" content="([^"]+\S)\s*" />', content)
+  if mo_author:
+    r['author'] = mo_author.group(1)
+
+  mo_date = re.search(r'<meta name="rbpubdate" content="(\d\d\d\d-\d\d-\d\d)', content)
+  if mo_date:
+    r['date'] = datetime.datetime.strptime(mo_date.group(1), '%Y-%m-%d').date()
+
+  mo_title = re.search(r'<meta name="rbtitle" content="([^"]+\S)\s*" />', content)
+  if mo_title:
+    r['title'] = mo_title.group(1)
+
+  return r
+
+
 scrapers = {
   "guardian.co.uk":     scrape_guardian,
   "independent.co.uk":  scrape_independent,
@@ -133,6 +155,7 @@ scrapers = {
   "dailymail.co.uk":    scrape_mail,
   "telegraph.co.uk":    scrape_telegraph,
   "news.cnet.com":      scrape_cnet,
+  "newscientist.com":   scrape_newscientist,
 }
 
 def scrape(host, content):
