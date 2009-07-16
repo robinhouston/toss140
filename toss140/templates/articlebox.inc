@@ -22,7 +22,7 @@
 				{%endif%}
 			<a class="link-organ" href="/organ/{{article.parent.name|urlencode}}{{q}}">{{article.parent.name}}</a>
 			{%if admin%}
-				<a class="admin" href="/admin/datastore/edit?key={{article.key}}&amp;kind=Article&amp;next={{this_page|urlencode}}">e</a>
+				<a class="admin" href="/admin/datastore/edit?key={{article.key}}&amp;kind=Article&amp;next={{refresh_url|urlencode}}">e</a>
 			{%endif%}
 		</div>
 	</div>

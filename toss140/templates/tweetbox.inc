@@ -2,7 +2,7 @@
 	<div class="tweetbox">
 		<div class="tweet">{{tweet.text|escape}}
 			{%if admin%}
-				<a class="admin" href="/admin/datastore/edit?key={{tweet.key}}&amp;kind=Tweet&amp;next={{this_page|urlencode}}">e</a>
+				<a class="admin" href="/admin/datastore/edit?key={{tweet.key}}&amp;kind=Tweet&amp;next={{refresh_url|urlencode}}">e</a>
 			{%endif%}
 		</div>
 		<div class="meta">
@@ -29,7 +29,7 @@
 				{% endif %}
 			
 				{%if admin%}
-					<a class="admin" href="/admin/datastore/edit?key={{tweet.article.key}}&amp;kind=Article&amp;next={{this_page|urlencode}}">e</a>
+					<a class="admin" href="/admin/datastore/edit?key={{tweet.article.key}}&amp;kind=Article&amp;next={{refresh_url|urlencode}}">e</a>
 					<a class="admin" href="/do/index-tweet?key={{tweet.key}}">r</a>
 				{%endif%}
 		</div>

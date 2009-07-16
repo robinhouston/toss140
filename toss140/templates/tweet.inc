@@ -7,7 +7,7 @@
 			&ldquo;{{tweet.text|escape}}&rdquo;
 		{% endif %}
 		{%if admin%}
-			<a class="admin" href="/admin/datastore/edit?key={{tweet.key}}&amp;kind=Tweet&amp;next={{this_page|urlencode}}">e</a>
+			<a class="admin" href="/admin/datastore/edit?key={{tweet.key}}&amp;kind=Tweet&amp;next={{refresh_url|urlencode}}">e</a>
 			<a class="admin" href="/do/index-tweet?key={{tweet.key}}">r</a>
 		{%endif%}
 		<div class="tweeter">
