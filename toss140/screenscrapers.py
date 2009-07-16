@@ -126,6 +126,27 @@ def scrape_telegraph(content):
   if mo_author:
     r['date'] = datetime.datetime.strptime(mo_date.group(1), '%Y-%m-%d').date()
 
+  mo_title = re.search(r'(?s)<title>\s*(.*?)\s* - Telegraph</title>', content)
+  if mo_title:
+    r['title'] = mo_title.group(1)
+
+  return r
+
+def scrape_telegraph_blogs(content):
+  r = {}
+  
+  mo_author = re.search(r'<span class="byAuthor">By <a[^>]+>([^<]+)', content)
+  if mo_author:
+    r['author'] = mo_author.group(1)
+  
+  mo_date = re.search(r'meta name="DC.date.issued" content="(\d\d\d\d-\d\d-\d\d)" />', content)
+  if mo_author:
+    r['date'] = datetime.datetime.strptime(mo_date.group(1), '%Y-%m-%d').date()
+
+  mo_title = re.search(r'(?s)<title>\s*(.*?)\s* - Telegraph Blogs</title>', content)
+  if mo_title:
+    r['title'] = mo_title.group(1)
+
   return r
 
 def scrape_newscientist(content):
@@ -154,6 +175,7 @@ scrapers = {
   "dailyexpress.co.uk": scrape_express,
   "dailymail.co.uk":    scrape_mail,
   "telegraph.co.uk":    scrape_telegraph,
+  "blogs.telegraph.co.uk": scrape_telegraph_blogs,
   "news.cnet.com":      scrape_cnet,
   "newscientist.com":   scrape_newscientist,
 }
