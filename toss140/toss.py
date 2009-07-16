@@ -28,6 +28,7 @@ ORGAN_TEMPLATE     = os.path.join(TEMPLATES, 'organ.tmpl')
 DATE_TEMPLATE      = os.path.join(TEMPLATES, 'date.tmpl')
 LINKLESS_TEMPLATE  = os.path.join(TEMPLATES, 'linkless.tmpl')
 
+VERSION, MINOR_VERSION = os.environ.get('CURRENT_VERSION_ID').split('.')
 
 def articles_by_site_name(site_name):
   site = data.Site.all().filter('name =', site_name).get()
@@ -69,7 +70,13 @@ def date_after(date):
     return article_after.date
 
 def _tweets():
-  return data.Tweet.all().order("-created_at").fetch(FETCH_SIZE)
+  tweets = []
+  for tweet in data.Tweet.all().order("-created_at"):
+    if tweet.long_url and not tweet.is_retweet:
+      tweets.append(tweet)
+      if len(tweets) == FETCH_SIZE:
+        break
+  return tweets
 
 def tweets_without_link():
   return data.Tweet.all().filter("long_url =", None).order("-created_at").fetch(FETCH_SIZE)
@@ -108,9 +115,7 @@ class PageHandler(webapp.RequestHandler):
     if admin and not users.is_current_user_admin():
       self.redirect("/login?r=" + urllib.quote(self.request.uri))
     
-    memcache_key = self.memcache_key(*args)
-    if admin:
-      memcache_key = 'admin:' + memcache_key
+    memcache_key = 'v' + VERSION + ':' + self.memcache_key(*args)
 
     # At least on the dev server, self.request.uri contains the
     # URI of the original request, NOT of the target of the redirect,
@@ -118,8 +123,11 @@ class PageHandler(webapp.RequestHandler):
     uri = re.sub(r'[?&]refresh.*', '', self.request.uri)
     if self.request.get("refresh"):
       memcache.delete(memcache_key)
+      memcache.delete('admin:' + memcache_key)
       self.redirect(uri)
 
+    if admin:
+      memcache_key = 'admin:' + memcache_key
 
     content = memcache.get(memcache_key)
     if content is None:
