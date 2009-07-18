@@ -191,6 +191,9 @@ h2 a:visited, h2 a:link {
 	margin-left: 2em;
 	margin-top: 3px;
 }
+.tweet a:link, .tweet a:visited {
+	color: inherit;
+}
 
 .articlebox {
 	margin-bottom: 10px;
