@@ -113,7 +113,12 @@ def article(fh):
     site = data.get_site(host)
     title = None
 
-    content = fh.read(32767).decode('utf-8')
+    content_bytes = fh.read(32767)
+    try:
+      content = content_bytes.decode('utf-8')
+    except UnicodeDecodeError:
+      logging.debug("Content could not be interpreted as UTF-8, trying ISO-8859-1")
+      content = content_bytes.decode('ISO-8859-1')
     mo = re.search(r'(?s)<title>(.*?)</title>', content)
     if mo:
       title = mo.group(1)
