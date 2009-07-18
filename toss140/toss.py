@@ -46,7 +46,7 @@ def tweets_by_tweeter(tweeter):
   return data.Tweet.all().filter('from_user =', tweeter).order('-created_at').fetch(FETCH_SIZE)
 
 def _articles():
-  return data.Article.all().order('-date').fetch(FETCH_SIZE)
+  return data.Article.all().order('-date').order('-added_at').fetch(FETCH_SIZE)
 
 def articles_by_date(date):
   logging.info("date = %s", str(date))

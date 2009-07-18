@@ -30,6 +30,7 @@ class Article(db.Model):
   author = db.StringProperty(required=False)
   title  = db.StringProperty(required=False)
   date   = db.DateProperty  (required=False)
+  added_at = db.DateTimeProperty(required=True, auto_now_add=True)
   
   def tweets(self):
     return Tweet.all().filter('article =', self).order('-created_at')
