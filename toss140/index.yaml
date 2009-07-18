@@ -10,11 +10,19 @@ indexes:
 # automatically uploaded to the admin console when you next deploy
 # your application using appcfg.py.
 
-# Unused in query history -- copied from input.
+# Used once in query history.
 - kind: Article
   properties:
   - name: author
   - name: date
+    direction: desc
+
+# Used 23 times in query history.
+- kind: Article
+  properties:
+  - name: date
+    direction: desc
+  - name: added_at
     direction: desc
 
 # Unused in query history -- copied from input.
@@ -45,14 +53,14 @@ indexes:
   - name: date
     direction: desc
 
-# Used 60 times in query history.
+# Used 814 times in query history.
 - kind: Tweet
   properties:
   - name: article
   - name: created_at
     direction: desc
 
-# Unused in query history -- copied from input.
+# Used 10 times in query history.
 - kind: Tweet
   properties:
   - name: from_user
@@ -65,7 +73,7 @@ indexes:
   - name: is_retweet
   - name: long_url
 
-# Unused in query history -- copied from input.
+# Used 3 times in query history.
 - kind: Tweet
   properties:
   - name: long_url
