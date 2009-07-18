@@ -1,2 +1,5 @@
 *.pyc
 data
+data.old
+data.older
+logs
