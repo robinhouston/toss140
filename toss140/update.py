@@ -297,10 +297,19 @@ class ReTweetHandler(webapp.RequestHandler):
   def post(self):
     key = self.request.get("key")
     tweet = data.Tweet.get(key)
-    status = re.sub(r'#toss140', '', tweet.raw_text)
-    status = re.sub(r' +', ' ', status)
-    status = status[: 138 - len(tweet.from_user)] + ' @' + tweet.from_user
-    post_data = urllib.urlencode({"status": status, "in_reply_to_status_id": tweet.id})
+
+    if tweet.is_retweet or not tweet.short_url:
+      return
+    
+    suffix = ' ' + tweet.short_url + ' @' + tweet.from_user
+    if tweet.text + len(suffix) <= 140:
+      truncated_text = tweet.text
+    else:
+      truncated_text = tweet.text[: 140 - len(suffix) - 1] + u'\u2026'
+
+    post_data = urllib.urlencode({
+      "status": (truncated_text + suffix).encode('utf-8'),
+    })
     for destination in data.Destination.all():
       fh = urllib.urlopen(destination.url_with_auth(), post_data)
       logging.debug(fh.read())
