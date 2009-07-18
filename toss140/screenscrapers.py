@@ -188,6 +188,25 @@ def scrape_irishtimes(content):
   
   return r
 
+def scrape_spectator(content):
+  r = {}
+  
+  # This only works for the Spectator Blogs
+  mo_author = re.search(r'<div id="crumbs">\s*<span><a href="/">Home</a></span>\s*<span>&gt;</span>\s*<span><a href="/[^/]+/">([^<]+)</a></span>', content)
+  if mo_author:
+    r['author'] = mo_author.group(1)
+
+  # <div id="date"><span class="name">Friday, 17th July 2009</span></div>
+  mo_date = re.search(r'<div id="date"><span class="name">([A-Z][a-z]+, \d\d?)(st|nd|rd|th)( [A-Z][a-z]+ \d\d\d\d)</span></div>', content)
+  if mo_date:
+    r['date'] = datetime.datetime.strptime(mo_date.group(1) + mo_date.group(3), '%A, %d %B %Y').date()
+  
+  mo_title = re.search(r'<div id="headline">\s*<h1>([^<]+)</h1>', content)
+  if mo_title:
+    r['title'] = mo_title.group(1)
+
+  return r
+
 scrapers = {
   "guardian.co.uk":     scrape_guardian,
   "independent.co.uk":  scrape_independent,
@@ -200,6 +219,7 @@ scrapers = {
   "news.cnet.com":      scrape_cnet,
   "newscientist.com":   scrape_newscientist,
   "irishtimes.com":     scrape_irishtimes,
+  "spectator.co.uk":    scrape_spectator,
 }
 
 def scrape(host, content):
