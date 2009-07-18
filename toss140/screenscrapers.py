@@ -194,7 +194,12 @@ def scrape_spectator(content):
   # This only works for the Spectator Blogs
   mo_author = re.search(r'<div id="crumbs">\s*<span><a href="/">Home</a></span>\s*<span>&gt;</span>\s*<span><a href="/[^/]+/">([^<]+)</a></span>', content)
   if mo_author:
-    r['author'] = mo_author.group(1)
+    if mo_author.group(1) == 'The Magazine':
+      mo_author = re.search(r'<div id="name"><span class="name"><a [^>]+>([^<]+)', content)
+      if mo_author:
+        r['author'] = mo_author.group(1)
+    else:
+      r['author'] = mo_author.group(1)
 
   # <div id="date"><span class="name">Friday, 17th July 2009</span></div>
   mo_date = re.search(r'<div id="date"><span class="name">([A-Z][a-z]+, \d\d?)(st|nd|rd|th)( [A-Z][a-z]+ \d\d\d\d)</span></div>', content)
