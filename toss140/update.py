@@ -302,7 +302,7 @@ class ReTweetHandler(webapp.RequestHandler):
       return
     
     suffix = ' ' + tweet.short_url + ' @' + tweet.from_user
-    if tweet.text + len(suffix) <= 140:
+    if len(tweet.text) + len(suffix) <= 140:
       truncated_text = tweet.text
     else:
       truncated_text = tweet.text[: 140 - len(suffix) - 1] + u'\u2026'
