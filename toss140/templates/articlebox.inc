@@ -16,11 +16,12 @@
 		{% endfor %}
 		<div class="author">
 			– {%if article.author%}
-					<a class="link-author" href="/author/{{article.author|urlencode}}{{q}}">{{article.author}}</a>,
+					<a href="/author/{{article.author|urlencode}}{{q}}">{{article.author}}</a>,
 				{%else%}
 					author unknown,
 				{%endif%}
-			<a class="link-organ" href="/organ/{{article.parent.name|urlencode}}{{q}}">{{article.parent.name}}</a>
+			<a href="/organ/{{article.parent.name|urlencode}}{{q}}">{{article.parent.name}}</a>
+			<a href="{{article.url|escape}}"><img alt="(link)" src="/Icon_External_Link.png" /></a>
 			{%if admin%}
 				<a class="admin" href="/admin/datastore/edit?key={{article.key}}&amp;kind=Article&amp;next={{refresh_url|urlencode}}">e</a>
 			{%endif%}
