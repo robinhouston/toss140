@@ -166,6 +166,27 @@ def scrape_newscientist(content):
 
   return r
 
+def scrape_irishtimes(content):
+  r = {}
+  
+  mo_author = re.search(r'writes ([A-Z]+ )?\n<strong>([^<]+)</strong>&#160;\.</p>', content)
+  if mo_author:
+    if mo_author.group(1):
+      author_allcaps = mo_author.group(1) + mo_author.group(2)
+    else:
+      author_allcaps = mo_author.group(2)
+    r['author'] = re.sub(r'[A-Z]+', lambda m: unicode.capitalize(m.group(0)), author_allcaps)
+  
+  # <span class="date-info">Friday, July 17, 2009</span>
+  mo_date = re.search(r'<span class="date-info">([A-Z][a-z]+, [A-Z][a-z]+ \d\d?, \d\d\d\d)</span>', content)
+  if mo_date:
+    r['date'] = datetime.datetime.strptime(mo_date.group(1), '%A, %B %d, %Y').date()
+    
+  mo_title = re.search(r'''var it_headline = '(.*)';''', content)
+  if mo_title:
+    r['title'] = mo_title.group(1)
+  
+  return r
 
 scrapers = {
   "guardian.co.uk":     scrape_guardian,
@@ -178,6 +199,7 @@ scrapers = {
   "blogs.telegraph.co.uk": scrape_telegraph_blogs,
   "news.cnet.com":      scrape_cnet,
   "newscientist.com":   scrape_newscientist,
+  "irishtimes.com":     scrape_irishtimes,
 }
 
 def scrape(host, content):
