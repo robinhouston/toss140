@@ -85,7 +85,7 @@ def date_after(date):
     return article_after.date
 
 
-def _tweets(n=FETCH_SIZE):
+def recent_tweets(n=FETCH_SIZE):
   tweets = []
   for tweet in data.Tweet.all().order("-created_at"):
     if tweet.long_url and not tweet.is_retweet:
@@ -161,6 +161,8 @@ class PageHandler(webapp.RequestHandler):
       template_args['debug'] = DEBUG
       template_args['admin'] = admin
       template_args['this_page'] = uri
+      template_args['recent_tweets'] = recent_tweets(5)
+  
       if admin:
         template_args['q'] = '?admin=1'
         template_args['refresh_url'] = uri + '&refresh=1'
@@ -228,7 +230,7 @@ class RecentHandler(PageHandler):
 
   def template_args(self):
     return {
-      "tweets": _tweets(),
+      "tweets": recent_tweets(),
     }
 
 class DateHandler(PageHandler):
@@ -304,7 +306,6 @@ class TimelineHandler(PageHandler):
         raise NotFound
     return {
       "articles": articles,
-      "tweets":   _tweets(5),
       "older":    date_before(articles[-1].date),
       "newer":    date_after (articles[0].date),
       "date":     date,

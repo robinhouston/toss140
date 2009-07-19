@@ -130,9 +130,11 @@ h2 a:visited, h2 a:link {
 #info h2 {
 	line-height: 1.1em;
 }
+#infobox h2 {
+	color: #999;
+}
 
 .tweetbox {
-	background: #EFF;
 	padding-left: 10px;
 	padding-top: 5px;
 	padding-right: 8px;
@@ -177,7 +179,7 @@ h2 a:visited, h2 a:link {
 	padding-right: 10px;
 	margin-left: 10px;
 	margin-top: 10px;
-	margin-bottom: 5px;
+	margin-bottom: 0;
 	width: 500px;
 }
 #about h2 {
@@ -186,11 +188,15 @@ h2 a:visited, h2 a:link {
 }
 #tweets.mini, #infobox.mini {
 	font-size: 11px;
-	float: left;
+	float: right; clear: right;
 	display: inline; /* workaround for E6 rendering bug, ignored by proper browsers */
 	width: 340px;
 	padding-left: 0;
-	margin-right: 0;
+	margin-right: 10px;
+	background: #CFF; /*#A3FBFF;*/
+}
+#tweets.mini {
+	margin-bottom: 10px;
 }
 #infobox {
 	color: #666;

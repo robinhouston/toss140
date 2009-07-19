@@ -1,13 +1,13 @@
 {% extends "master.tmpl" %}
 
-{% block title %}Recent summaries | toss140.net{% endblock %}
+{% block title %}Recently posted | toss140.net{% endblock %}
 
 {% block content %}
 	<div id="tweets">
-		<h2>Recent summaries</h2>
+		<h2>Recently posted</h2>
 		{% for tweet in tweets %}
 			{% include "tweetbox.inc" %}
 		{% endfor %}
 	</div>
-	{% include 'infobox.inc' %}
+	{% include 'sidebar.inc' %}
 {% endblock %}

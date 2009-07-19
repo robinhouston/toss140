@@ -3,7 +3,6 @@
 {% block title %}toss140.net – comment on the commentators{% endblock %}
 
 {% block content %}
-	{# <div id="info">{% include "info.inc" %}</div> #}
 	<div id="articles">
 		<div class="datenav" id="datenav-top">
 			{% if older %}
@@ -39,10 +38,5 @@
 			{% endif %}
 		</div>
 	</div>
-	<div id="tweets" class="mini">
-		<h2><a href="/recent{{q}}">Recently posted</a></h2>
-		{% for tweet in tweets %}
-			{% include "tweetbox.inc" %}
-		{% endfor %}
-	</div>
+	{% include 'sidebar.inc' %}
 {% endblock %}
