@@ -53,7 +53,7 @@ def articles_on_date(date, n=FETCH_SIZE):
   logging.info("fetching articles for date = %s", str(date))
   return data.Article.all().filter('date =', date).order("-date").order('-added_at').fetch(n)
 
-def articles_up_to_date(date, n=FETCH_SIZE):
+def articles_till_date(date, n=FETCH_SIZE):
   n_articles_back = data.Article.all().filter('date <=', date).order('-date').fetch(limit=1, offset=n-1)
   if not n_articles_back:
     return data.Article.all().filter('date <=', date).order("-date").order('-added_at').fetch(n)
@@ -302,7 +302,7 @@ class TimelineHandler(PageHandler):
     else:
       date = parse_iso_date(datestr)
       if direction == 'till':
-        articles = articles_up_to_date(date)
+        articles = articles_till_date(date)
       elif direction == 'since':
         articles = articles_since_date(date)
       else:
