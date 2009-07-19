@@ -55,7 +55,7 @@ a.admin {
 	position: absolute;
 	top: 2.1em;
 	left: 580px;
-	background: #white;
+	background: white;
 	color: #600;
 	line-height: 130%;
 	padding: .8em .8em .8em .8em;
@@ -101,7 +101,8 @@ h3 {
 	top: 16px;
 	right: 16em;
 	padding: 1px 3px 1px 3px;
-	color: white; background: #3cf;
+	color: white;
+	background: #3cf;
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
 }
@@ -193,7 +194,7 @@ h2 a:visited, h2 a:link {
 	width: 340px;
 	padding-left: 0;
 	margin-right: 10px;
-	background: #CFF; /*#A3FBFF;*/
+	/*background: #CFF; /*#A3FBFF;*/
 }
 #tweets.mini {
 	margin-bottom: 10px;
