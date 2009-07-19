@@ -1,10 +1,12 @@
 {% extends "master.tmpl" %}
 
-{% block title %}{{tweeter}} | toss140.net{% endblock %}
+{% block title %}{{ tweeter }} | toss140.net{% endblock %}
 
 {% block content %}
 	<div id="tweets">
-		<h2>Summarised by <a href="http://twitter.com/{{tweeter}}">{{tweeter}}</a></h2>
+		<h2>Summarised by <a
+			onclick="javascript:pageTracker._trackPageview('/outbound/tweeter/{{ tweeter|urlencode }}')"
+			href="http://twitter.com/{{ tweeter|urlencode }}">{{ tweeter }}</a></h2>
 		{% for tweet in tweets %}
 			{% include "tweetbox.inc" %}
 		{% endfor %}

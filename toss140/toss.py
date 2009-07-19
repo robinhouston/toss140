@@ -30,17 +30,11 @@ LINKLESS_TEMPLATE  = os.path.join(TEMPLATES, 'linkless.tmpl')
 
 VERSION, MINOR_VERSION = os.environ.get('CURRENT_VERSION_ID').split('.')
 
-def articles_by_site_name(site_name):
-  site = data.Site.all().filter('name =', site_name).get()
-  if site is None:
-    raise NotFound
-  return articles_by_site(site)
-
 def articles_by_site(site):
-  return data.Article.all().ancestor(site).order('-date').fetch(FETCH_SIZE)
+  return data.Article.all().ancestor(site).order('-date').order('-added_at').fetch(FETCH_SIZE)
 
 def articles_by_author(author):
-  return data.Article.all().filter('author =', author).order('-date').fetch(FETCH_SIZE)
+  return data.Article.all().filter('author =', author).order('-date').order('-added_at').fetch(FETCH_SIZE)
 
 def tweets_by_tweeter(tweeter):
   return data.Tweet.all().filter('from_user =', tweeter).order('-created_at').fetch(FETCH_SIZE)
@@ -53,17 +47,17 @@ def articles_by_date(date):
   return data.Article.all().filter('date =', date).order("-date").fetch(FETCH_SIZE)
 
 def articles_up_to_date(date):
-  return data.Article.all().filter('date <=', date).order("-date").fetch(FETCH_SIZE)
+  return data.Article.all().filter('date <=', date).order("-date").order('-added_at').fetch(FETCH_SIZE)
 
 def date_before(date):
-  article_before = data.Article.all().filter('date <', date).order("-date").get()
+  article_before = data.Article.all().filter('date <', date).order("-date").order('-added_at').get()
   if article_before is None:
     return None
   else:
     return article_before.date
 
 def date_after(date):
-  article_after = data.Article.all().filter('date >', date).order("date").get()
+  article_after = data.Article.all().filter('date >', date).order("date").order('-added_at').get()
   if article_after is None:
     return None
   else:
@@ -191,9 +185,13 @@ class OrganHandler(PageHandler):
     return ORGAN_TEMPLATE
 
   def template_args(self, organ):
+    site = data.Site.all().filter('name =', organ).get()
+    if site is None:
+      raise NotFound
+    
     return {
-      "organ":    organ,
-      "articles": articles_by_site_name(organ),
+      "site":     site,
+      "articles": articles_by_site(site),
     }
 
 class TimelineHandler(PageHandler):

@@ -1,10 +1,11 @@
 {% extends "master.tmpl" %}
 
-{% block title %}{{organ}} | toss140.net{% endblock %}
+{% block title %}{{ site.name }} | toss140.net{% endblock %}
 
 {% block content %}
 	<div id="articles">
-	<h2>From {{ organ }}</h2>
+	<h2>From <a onclick="pageTracker._trackPageview('/outbound/site/{{ site.name|urlencode }}');"
+		href="http://{{ site.host }}/">{{ site.name }}</a></h2>
 	{% for article in articles %}
 		{% include 'articlebox.inc' %}
 	{% endfor %}

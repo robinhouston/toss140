@@ -31,14 +31,12 @@ a.admin {
 	position: relative;
 }
 
-h1 {
-	font-family: 'Gill Sans', 'Corbel', sans-serif;
-	color: #3cf;
-	background: #fff;
-	font-size: 36pt;
-	text-align: left;
-	line-height: 150%;
+#header {
+	background: #f6ffff;
+	
 	padding-left: 2em;
+	padding-top: 1.5em;
+	padding-bottom: 1em;
 	
 	-moz-border-radius-topright: 5px;
 	-moz-border-radius-topleft: 5px;
@@ -49,11 +47,41 @@ h1 {
 	margin-bottom: 0px;
 	border-bottom: 1px dotted black;
 }
-h1 a:visited, h1 a:link {
-	margin: 0 0 0 0;
+.strapline {
+	margin-top: 10px;
+	margin-left: 100px;
+	color: #900;
+}
+#tr {
+	position: absolute;
+	top: .9em;
+	left: 600px;
+	background: #white;
+	color: #600;
+	line-height: 130%;
+	padding: .8em .8em .8em .8em;
+/*	border: 1px dotted #eee;
+	border-style: solid;
+*/	-webkit-box-shadow: -1px 1px 6px #bcc;
+	-moz-box-shadow: -1px 1px 4px #acc;
+/*	border-top-color: #eee;
+	border-right-color: #eee;
+	border-bottom-color: #cff;
+	border-left-color: #cff;
+	border-top-width: 0;
+	border-right-width: 0;
+	border-bottom-width: 2px;
+	border-left-width: 2px;
+*//*	-moz-border-radius: 1em;
+	-webkit-border-radius: 1em;
+*/}
+#tr a:link, #tr a:visited {
 	color: inherit;
 }
-p, h3 {
+/*#tr:hover {
+	background: #DDD;
+}
+*/p, h3 {
 	line-height: 130%;
 }
 h3 {
@@ -63,13 +91,13 @@ h3 {
 #menu {
 	position: absolute;
 	top: 26pt;
-	right: 2em;
+	right: 1.2em;
 }
 .menu-item {
 	font-family: 'Gill Sans', 'Corbel', sans-serif;
 	color: red;
 	font-size: 18pt;
-	margin-right: 6px;
+	margin: 6px 6px 6px 0;
 }
 .menu-item a:link, .menu-item a:visited {
 	color: inherit;
@@ -149,7 +177,7 @@ h2 a:visited, h2 a:link {
 }
 #articles, #tweets, #about, #infobox {
 	float: left;
-	display: inline; /* workaround for E6 rendering bug, ignore by proper browsers */
+	display: inline; /* workaround for E6 rendering bug, ignored by proper browsers */
 	background: #EFF;
 	padding-left: 10px;
 	padding-top: 10px;
@@ -167,7 +195,7 @@ h2 a:visited, h2 a:link {
 #tweets.mini, #infobox.mini {
 	font-size: 11px;
 	float: left;
-	display: inline; /* workaround for E6 rendering bug, ignore by proper browsers */
+	display: inline; /* workaround for E6 rendering bug, ignored by proper browsers */
 	width: 330px;
 	padding-left: 0;
 	margin-right: 0;

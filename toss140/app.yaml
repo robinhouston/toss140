@@ -1,5 +1,5 @@
 application: toss140
-version: 1
+version: 2
 runtime: python
 api_version: 1
 
@@ -53,9 +53,9 @@ handlers:
   static_files: \1
   upload: toss\.css
 
-- url: /(.*\.png)
+- url: /(img/.*\.png)
   static_files: \1
-  upload: .*\.png
+  upload: img/.*\.png
 
 - url: /(js/.*\.js)
   static_files: \1

@@ -21,7 +21,8 @@
 					author unknown,
 				{%endif%}
 			<a href="/organ/{{article.parent.name|urlencode}}{{q}}">{{article.parent.name}}</a>
-			<a href="{{article.url|escape}}"><img alt="(link)" src="/Icon_External_Link.png" /></a>
+			<a onclick="javascript:pageTracker._trackPageview('/outbound/from_icon/{{ article.author|urlencode }}');"
+				href="{{article.url|escape}}"><img alt="(link)" src="/img/Icon_External_Link.png" /></a>
 			{%if admin%}
 				<a class="admin" href="/admin/datastore/edit?key={{article.key}}&amp;kind=Article&amp;next={{refresh_url|urlencode}}">e</a>
 			{%endif%}

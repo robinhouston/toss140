@@ -8,13 +8,18 @@
 		{% for tweet in tweets %}
 		<div class="tweetbox">
 			<div class="tweet">
-				{{tweet.raw_text|escape}}
+				<a
+					onclick="javascript:pageTracker._trackPageview('/outbound/status/{{ tweet.id }}');"
+					href="http://twitter.com/{{tweet.from_user}}/status/{{tweet.id}}{{q}}"
+				>{{tweet.raw_text|escape}}</a>
 				{%if admin%}
 					<a class="admin" href="/admin/datastore/edit?key={{tweet.key}}&amp;kind=Tweet&amp;next={{refresh_url|urlencode}}">e</a>
 					<a class="admin" href="/do/index-tweet?key={{tweet.key}}">r</a>
 				{%endif%}
 				<div class="tweet-date">–&nbsp;{{tweet.created_at|date:"D jS F Y, H:i:s"}}
-				<div class="tweeter"><a href="http://twitter.com/{{tweet.from_user}}/status/{{tweet.id}}{{q}}">{{tweet.from_user}}</a></div>
+				<div class="tweeter"><a
+					onclick="javascript:pageTracker._trackPageview('/outbound/tweeter/{{ tweet.from_user|urlencode }}');"
+					href="http://twitter.com/{{ tweet.from_user|urlencode }}">{{tweet.from_user}}</a></div>
 				</div>
 			</div>
 		</div>

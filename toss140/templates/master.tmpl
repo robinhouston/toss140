@@ -16,16 +16,29 @@
 </head>
 <body>
 	<div id="content">
-		<h1><a href="/{{q}}">toss140.net</a></h1>
-		<div id="menu">
-			<span class="menu-item" id="participate"><a href="/about{{q}}">About / Join in</a></span>
-			{% if refresh_url %}
-				<span class="menu-item"><a href="{{refresh_url|escape}}">refresh</a></span>
-			{% endif %}
-			{% if logout_url %}
-				<span class="menu-item"><a href="{{logout_url|escape}}">log out</a></span>
-			{% endif %}
+		<div id="header">
+			<a href="/{{q}}"><img src="/img/toss140_big.png" alt="toss140.net" /></a>
+			<div class="strapline">one-line summaries of newspaper columnists, written by you</div>
 		</div>
+		<div id="tr">
+			<a href="/about{{q}}">
+			twitter about any story,<br />
+			link to it,<br />
+			use #toss140.<br />
+			we will find your summary<br />
+			and put it here.
+			</a>
+		</div>
+		{% if admin %}
+			<div id="menu">
+				{% if refresh_url %}
+					<div class="menu-item"><a href="{{refresh_url|escape}}">refresh</a></div>
+				{% endif %}
+				{% if logout_url %}
+					<div class="menu-item"><a href="{{logout_url|escape}}">log out</a></div>
+				{% endif %}
+			</div>
+		{% endif %}
 		{% block content %}{% endblock %}
 		<div class="attribution">conceived by @<a href="http://twitter.com/bengoldacre">bengoldacre</a> &middot; web site by @<a href="http://twitter.com/robinhouston">robinhouston</a></div>
 	</div>

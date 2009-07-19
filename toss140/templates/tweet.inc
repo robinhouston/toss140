@@ -2,7 +2,9 @@
 {% if not tweet.is_retweet %}
 	<div class="tweet">
 		{%if article.url %}
-		&ldquo;<a href="{{article.url|escape}}">{{tweet.text|escape}}</a>&rdquo;
+		&ldquo;<a href="{{article.url|escape}}"
+			onclick="javascript:pageTracker._trackPageview('/outbound/from_text/{{ tweet.key.name }}');"
+			>{{tweet.text|escape}}</a>&rdquo;
 		{% else %}
 			&ldquo;{{tweet.text|escape}}&rdquo;
 		{% endif %}
@@ -12,7 +14,9 @@
 		{%endif%}
 		<div class="tweeter">
 			<a href="/tweeter/{{tweet.from_user|urlencode}}{{q}}">{{tweet.from_user}}</a>
-			<a class="tau" href="http://twitter.com/{{tweet.from_user}}/status/{{tweet.id}}">#</a>
+			<a class="tau"
+				onclick="javascript:pageTracker._trackPageview('/outbound/status/{{ tweet.id }}');"
+				href="http://twitter.com/{{tweet.from_user}}/status/{{tweet.id}}">#</a>
 		</div>
 	</div>
 {% endif %}
