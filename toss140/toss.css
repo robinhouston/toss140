@@ -236,7 +236,7 @@ h2 a:visited, h2 a:link {
 	color: #666;
 	margin-left: 4px;
 }
-.articlebox .tweeter a:link, .articlebox .tweeter a:visited {
+.tweeter a:link, .tweeter a:visited {
 	color: #559;
 }
 .author {
