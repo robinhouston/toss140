@@ -30,50 +30,62 @@ LINKLESS_TEMPLATE  = os.path.join(TEMPLATES, 'linkless.tmpl')
 
 VERSION, MINOR_VERSION = os.environ.get('CURRENT_VERSION_ID').split('.')
 
-def articles_by_site(site):
-  return data.Article.all().ancestor(site).order('-date').order('-added_at').fetch(FETCH_SIZE)
+def articles_by_site(site, n=FETCH_SIZE):
+  return data.Article.all().ancestor(site).order('-date').order('-added_at').fetch(n)
 
-def articles_by_author(author):
-  return data.Article.all().filter('author =', author).order('-date').order('-added_at').fetch(FETCH_SIZE)
+def articles_by_author(author, n=FETCH_SIZE):
+  return data.Article.all().filter('author =', author).order('-date').order('-added_at').fetch(n)
 
-def tweets_by_tweeter(tweeter):
-  return data.Tweet.all().filter('from_user =', tweeter).order('-created_at').fetch(FETCH_SIZE)
+def _articles(n=FETCH_SIZE):
+  '''Fetch the latest articles.
+  Always get at least n articles if possible, and always include all the articles for
+  each day.
+  '''
+  n_articles_back = data.Article.all().order('-date').fetch(limit=1, offset=n-1)
+  if not n_articles_back:
+    return data.Article.all().order('-date').order('-added_at').fetch(n)
+  else:
+    return articles_since_date(n_articles_back[0].date, 1000)
 
-def _articles():
-  return data.Article.all().order('-date').order('-added_at').fetch(FETCH_SIZE)
-
-def articles_by_date(date):
+def articles_by_date(date, n=FETCH_SIZE):
   logging.info("date = %s", str(date))
-  return data.Article.all().filter('date =', date).order("-date").fetch(FETCH_SIZE)
+  return data.Article.all().filter('date =', date).order("-date").order('-added_at').fetch(n)
 
-def articles_up_to_date(date):
-  return data.Article.all().filter('date <=', date).order("-date").order('-added_at').fetch(FETCH_SIZE)
+def articles_up_to_date(date, n=FETCH_SIZE):
+  return data.Article.all().filter('date <=', date).order("-date").order('-added_at').fetch(n)
+
+def articles_since_date(date, n=FETCH_SIZE):
+  return data.Article.all().filter('date >=', date).order("-date").order('-added_at').fetch(n)
 
 def date_before(date):
-  article_before = data.Article.all().filter('date <', date).order("-date").order('-added_at').get()
+  article_before = data.Article.all().filter('date <', date).order("-date").get()
   if article_before is None:
     return None
   else:
     return article_before.date
 
 def date_after(date):
-  article_after = data.Article.all().filter('date >', date).order("date").order('-added_at').get()
+  article_after = data.Article.all().filter('date >', date).order("date").get()
   if article_after is None:
     return None
   else:
     return article_after.date
 
-def _tweets():
+
+def _tweets(n=FETCH_SIZE):
   tweets = []
   for tweet in data.Tweet.all().order("-created_at"):
     if tweet.long_url and not tweet.is_retweet:
       tweets.append(tweet)
-      if len(tweets) == FETCH_SIZE:
+      if len(tweets) == n:
         break
   return tweets
 
-def tweets_without_link():
-  return data.Tweet.all().filter("long_url =", None).order("-created_at").fetch(FETCH_SIZE)
+def tweets_by_tweeter(tweeter, n=FETCH_SIZE):
+  return data.Tweet.all().filter('from_user =', tweeter).order('-created_at').fetch(n)
+
+def tweets_without_link(n=FETCH_SIZE):
+  return data.Tweet.all().filter("long_url =", None).order("-created_at").fetch(n)
 
 def parse_iso_date(datestr):
   mo = re.match(r'^(\d\d\d\d)-(\d\d)-(\d\d)$', datestr)
@@ -287,7 +299,7 @@ class FrontHandler(PageHandler):
   def template_args(self):
       logging.info("Rebuilding front page")
       return {
-        "tweets":   _tweets(),
+        "tweets":   _tweets(5),
         "articles": _articles(),
         "front":    True,
       }

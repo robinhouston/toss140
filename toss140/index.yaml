@@ -10,14 +10,14 @@ indexes:
 # automatically uploaded to the admin console when you next deploy
 # your application using appcfg.py.
 
-# Used 3 times in query history.
+# Unused in query history -- copied from input.
 - kind: Article
   properties:
   - name: author
   - name: date
     direction: desc
 
-# Used 2 times in query history.
+# Unused in query history -- copied from input.
 - kind: Article
   properties:
   - name: author
@@ -26,14 +26,14 @@ indexes:
   - name: added_at
     direction: desc
 
-# Used once in query history.
+# Used 4 times in query history.
 - kind: Article
   properties:
   - name: date
   - name: added_at
     direction: desc
 
-# Used 42 times in query history.
+# Used 6 times in query history.
 - kind: Article
   properties:
   - name: date
@@ -62,14 +62,14 @@ indexes:
   - name: date
     direction: desc
 
-# Used 8 times in query history.
+# Unused in query history -- copied from input.
 - kind: Article
   ancestor: yes
   properties:
   - name: date
     direction: desc
 
-# Used 2 times in query history.
+# Unused in query history -- copied from input.
 - kind: Article
   ancestor: yes
   properties:
@@ -78,14 +78,14 @@ indexes:
   - name: added_at
     direction: desc
 
-# Used 1356 times in query history.
+# Used 92 times in query history.
 - kind: Tweet
   properties:
   - name: article
   - name: created_at
     direction: desc
 
-# Used 14 times in query history.
+# Unused in query history -- copied from input.
 - kind: Tweet
   properties:
   - name: from_user
@@ -98,7 +98,7 @@ indexes:
   - name: is_retweet
   - name: long_url
 
-# Used 9 times in query history.
+# Unused in query history -- copied from input.
 - kind: Tweet
   properties:
   - name: long_url

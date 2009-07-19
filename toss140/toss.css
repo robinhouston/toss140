@@ -6,7 +6,7 @@ body {
 }
 
 a:link, a:visited {
-	text-decoration: none; color: #668;
+	text-decoration: none; color: #38D;
 }
 a:hover {
 	text-decoration: underline;
@@ -24,8 +24,8 @@ a.admin {
 	width: 900px;
 	margin-left: auto;
 	margin-right: auto;
-	padding-bottom: 10px;
-	-moz-border-radius: 5px;
+/*	padding-bottom: 10px;
+*/	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
 	line-height: 1.2em;
 	position: relative;
@@ -64,7 +64,7 @@ a.admin {
 	-moz-box-shadow: -1px 1px 6px #bcc;
 }
 #tr a:link, #tr a:visited {
-	color: inherit;
+	color: #600;
 }
 /*#tr:hover {
 	background: #DDD;
@@ -88,7 +88,7 @@ h3 {
 	margin: 6px 6px 6px 0;
 }
 .menu-item a:link, .menu-item a:visited {
-	color: inherit;
+	color: red;
 }
 
 #what {
@@ -161,7 +161,7 @@ h2 a:visited, h2 a:link {
 	font-size: 14px;
 	margin-top: 15px;
 	margin-left: 1em;
-	color: #900;
+	color: #444;
 }
 #articles, #tweets, #about, #infobox {
 	float: left;
@@ -184,7 +184,7 @@ h2 a:visited, h2 a:link {
 	font-size: 11px;
 	float: left;
 	display: inline; /* workaround for E6 rendering bug, ignored by proper browsers */
-	width: 330px;
+	width: 340px;
 	padding-left: 0;
 	margin-right: 0;
 }
@@ -208,7 +208,7 @@ h2 a:visited, h2 a:link {
 	margin-top: 3px;
 }
 .tweet a:link, .tweet a:visited {
-	color: inherit;
+	color: #333; /* inherit here doesn't work in IE6 :-( */
 }
 
 .articlebox {
@@ -236,17 +236,18 @@ h2 a:visited, h2 a:link {
 .attribution {
 	clear: both;
 	position: static;
-	bottom: 10px;
 	text-align: center;
-	left: 10px;
-	right: 10px;
-	padding-left: 1em;
-	margin-top: 15px;
+	line-height: 30px;
+	background: #6AA;
 	font-family: Hoefler Text, serif;
-	line-height: 150%;
-	color: #666;
+	border-top: 1px dotted #FAA;
+	-moz-border-radius-bottomleft: 5px;
+	-moz-border-radius-bottomright: 5px;
+	-webkit-border-bottom-left-radius: 5px;
+	-webkit-border-bottom-right-radius: 5px;
+	color: #333;
 }
 
 .attribution a:link, .attribution a:visited {
-	color: #559;
+	color: #336;
 }
