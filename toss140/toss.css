@@ -65,6 +65,13 @@ a.admin {
 #tr a:link, #tr a:visited {
 	color: #600;
 }
+.ornament {
+	display: block;
+	clear: both;
+	margin: 5px auto 8px auto;
+	color: #003;
+	text-align: center;
+}
 
 p, h3 {
 	line-height: 130%;
