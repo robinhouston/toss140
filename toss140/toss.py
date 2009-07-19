@@ -17,7 +17,6 @@ FETCH_SIZE = 20
 
 TEMPLATES = os.path.join(os.path.dirname(__file__), 'templates')
 
-FRONT_TEMPLATE     = os.path.join(TEMPLATES, 'front.tmpl')
 ABOUT_TEMPLATE     = os.path.join(TEMPLATES, 'about.tmpl')
 TIMELINE_TEMPLATE  = os.path.join(TEMPLATES, 'timeline.tmpl')
 RECENT_TEMPLATE    = os.path.join(TEMPLATES, 'recent.tmpl')
@@ -36,8 +35,9 @@ def articles_by_site(site, n=FETCH_SIZE):
 def articles_by_author(author, n=FETCH_SIZE):
   return data.Article.all().filter('author =', author).order('-date').order('-added_at').fetch(n)
 
-def _articles(n=FETCH_SIZE):
+def latest_articles(n=FETCH_SIZE):
   '''Fetch the latest articles.
+  
   Always get at least n articles if possible, and always include all the articles for
   each day.
   '''
@@ -45,17 +45,35 @@ def _articles(n=FETCH_SIZE):
   if not n_articles_back:
     return data.Article.all().order('-date').order('-added_at').fetch(n)
   else:
-    return articles_since_date(n_articles_back[0].date, 1000)
+    date = n_articles_back[0].date
+    return data.Article.all().filter('date >=', date).order("-date").order('-added_at').fetch(1000)
 
-def articles_by_date(date, n=FETCH_SIZE):
-  logging.info("date = %s", str(date))
+
+def articles_on_date(date, n=FETCH_SIZE):
+  logging.info("fetching articles for date = %s", str(date))
   return data.Article.all().filter('date =', date).order("-date").order('-added_at').fetch(n)
 
 def articles_up_to_date(date, n=FETCH_SIZE):
-  return data.Article.all().filter('date <=', date).order("-date").order('-added_at').fetch(n)
+  n_articles_back = data.Article.all().filter('date <=', date).order('-date').fetch(limit=1, offset=n-1)
+  if not n_articles_back:
+    return data.Article.all().filter('date <=', date).order("-date").order('-added_at').fetch(n)
+  else:
+    return data.Article.all() \
+      .filter('date <=', date) \
+      .filter('date >=', n_articles_back[0].date) \
+      .order("-date").order('-added_at') \
+      .fetch(1000)
 
 def articles_since_date(date, n=FETCH_SIZE):
-  return data.Article.all().filter('date >=', date).order("-date").order('-added_at').fetch(n)
+  n_articles_forward = data.Article.all().filter('date >=', date).order('date').fetch(limit=1, offset=n-1)
+  if not n_articles_forward:
+    return data.Article.all().filter('date >=', date).order("-date").order('-added_at').fetch(n)
+  else:
+    return data.Article.all() \
+      .filter('date >=', date) \
+      .filter('date <=', n_articles_forward[0].date) \
+      .order("-date").order('-added_at') \
+      .fetch(1000)
 
 def date_before(date):
   article_before = data.Article.all().filter('date <', date).order("-date").get()
@@ -206,37 +224,6 @@ class OrganHandler(PageHandler):
       "articles": articles_by_site(site),
     }
 
-class TimelineHandler(PageHandler):
-  def memcache_key(self, date):
-    if date is None:
-      return "timeline"
-    else:
-      return "timeline=" + date
-  
-  def memcache_time(self, date):
-    # Set an explicit timeout on the timeline-to-date page, because it's
-    # tricky to expire these manually when a tweet is added. (How do you
-    # know which keys are affected?)
-    if date:
-      return 900
-    else:
-      return 0
-    
-  def template_path(self):
-    return TIMELINE_TEMPLATE
-
-  def template_args(self, datestr):
-    if datestr is None:
-      articles = _articles()
-      date = None
-    else:
-      date = parse_iso_date(datestr)
-      articles = articles_up_to_date(date)
-    return {
-      "articles": articles,
-      "date": date,
-    }
-
 class RecentHandler(PageHandler):
   def memcache_key(self):
     return "recent"
@@ -258,7 +245,7 @@ class DateHandler(PageHandler):
 
   def template_args(self, datestr):
     date = parse_iso_date(datestr)
-    articles = articles_by_date(date)
+    articles = articles_on_date(date)
     logging.info("Found %d articles on %s", len(articles), str(date))
     return {
       "date":      date,
@@ -289,36 +276,60 @@ class AboutHandler(PageHandler):
   def template_args(self):
     return {}
 
-class FrontHandler(PageHandler):
+class TimelineHandler(PageHandler):
+  def memcache_key(self, direction=None, date=None):
+    if date is None:
+      return "timeline"
+    else:
+      return "timeline=" + direction + '-' + date
+
+  def memcache_time(self, direction=None, date=None):
+    # Set an explicit timeout on the timeline-since/till pages, because it's
+    # tricky to expire these manually when a tweet is added. (How do you
+    # know which keys are affected?)
+    if date:
+      return 900
+    else:
+      return 0
+
   def template_path(self):
-    return FRONT_TEMPLATE
+    return TIMELINE_TEMPLATE
 
-  def memcache_key(self):
-    return "front"
-
-  def template_args(self):
-      logging.info("Rebuilding front page")
-      return {
-        "tweets":   _tweets(5),
-        "articles": _articles(),
-        "front":    True,
-      }
-
+  def template_args(self, direction=None, datestr=None):
+    if datestr is None:
+      articles = latest_articles()
+      date = None
+    else:
+      date = parse_iso_date(datestr)
+      if direction == 'till':
+        articles = articles_up_to_date(date)
+      elif direction == 'since':
+        articles = articles_since_date(date)
+      else:
+        raise NotFound
+    return {
+      "articles": articles,
+      "tweets":   _tweets(5),
+      "older":    date_before(articles[-1].date),
+      "newer":    date_after (articles[0].date),
+      "date":     date,
+      "front":    True,
+    }
 
 def main():
   application = webapp.WSGIApplication([
-    ('/login',              LoginHandler),
-                            
-    ('/',                   FrontHandler),
-    ('/about',              AboutHandler),
-    ('/timeline(?:/(.+))?', TimelineHandler),
-    ('/recent',             RecentHandler),
-                            
-    ('/author/([^/]+)',     AuthorHandler),
-    ('/tweeter/([^/]+)',    TweeterHandler),
-    ('/organ/([^/]+)',      OrganHandler),
-    ('/date/([^/]+)',       DateHandler),
-    ('/linkless',           LinklessHandler),
+    ('/login',             LoginHandler),
+                           
+    ('/',                  TimelineHandler),
+    ('/about',             AboutHandler),
+    ('/(since|till)/(.+)', TimelineHandler),
+    ('/recent',            RecentHandler),
+                           
+    ('/author/([^/]+)',    AuthorHandler),
+    ('/tweeter/([^/]+)',   TweeterHandler),
+    ('/organ/([^/]+)',     OrganHandler),
+    ('/date/([^/]+)',      DateHandler),
+    ('/linkless',          LinklessHandler),
   ], debug=DEBUG)
   wsgiref.handlers.CGIHandler().run(application)
 

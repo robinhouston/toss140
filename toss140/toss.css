@@ -24,8 +24,7 @@ a.admin {
 	width: 900px;
 	margin-left: auto;
 	margin-right: auto;
-/*	padding-bottom: 10px;
-*/	-moz-border-radius: 5px;
+	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
 	line-height: 1.2em;
 	position: relative;
@@ -34,7 +33,7 @@ a.admin {
 #header {
 	background: #f6ffff;
 	
-	padding-left: 2em;
+	padding-left: 6em;
 	padding-top: 1.5em;
 	padding-bottom: 1em;
 	
@@ -49,13 +48,13 @@ a.admin {
 }
 .strapline {
 	margin-top: 3px;
-	margin-left: 100px;
+	margin-left: 4em;
 	color: #900;
 }
 #tr {
 	position: absolute;
-	top: .9em;
-	left: 600px;
+	top: 2.1em;
+	left: 580px;
 	background: #white;
 	color: #600;
 	line-height: 130%;
@@ -66,10 +65,8 @@ a.admin {
 #tr a:link, #tr a:visited {
 	color: #600;
 }
-/*#tr:hover {
-	background: #DDD;
-}
-*/p, h3 {
+
+p, h3 {
 	line-height: 130%;
 }
 h3 {
@@ -231,6 +228,25 @@ h2 a:visited, h2 a:link {
 	margin-bottom: 6px;
 	text-align: right;
 	color: #666;
+}
+
+.datenav {
+	color: #900;
+}
+#datenav-top {
+	height: 2em;
+}
+#datenav-bottom {
+	margin-top: 2em;
+}
+.date-older {
+	float: left;
+}
+.date-newer {
+	float: right;
+}
+.datenav a:link, .datenav a:visited {
+	color: inherit;
 }
 
 .attribution {

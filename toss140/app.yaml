@@ -7,10 +7,14 @@ handlers:
 - url: /
   script: toss.py
 
+- url: /favicon.ico
+  static_files: img/favicon.ico
+  upload: img/favicon.ico
+
 - url: /about
   script: toss.py
 
-- url: /timeline(/\d{4}-\d\d-\d\d)?
+- url: /(since|till)/\d{4}-\d\d-\d\d
   script: toss.py
 
 - url: /recent(/\d{4}-\d\d-\d\d)?

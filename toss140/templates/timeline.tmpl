@@ -1,13 +1,64 @@
 {% extends "master.tmpl" %}
 
-{% block title %}Column timeline | toss140.net{% endblock %}
+{% block title %}toss140.net – comment on the commentators{% endblock %}
 
 {% block content %}
+	{# <div id="info">{% include "info.inc" %}</div> #}
 	<div id="articles">
-	<h2>Column timeline</h2>
-	{% for article in articles %}
-		{% include 'articlebox.inc' %}
-	{% endfor %}
+		<div class="datenav" id="datenav-top">
+			{% if older %}
+				<div class="date-older">
+					<a href="/till/{{ older }}{{q}}"
+					>« Older articles</a>
+				</div>
+			{% endif %}
+			{% if newer %}
+				<div class="date-newer">
+					<a href="/since/{{ newer }}{{q}}"
+					>Newer articles »</a>
+				</div>
+			{% endif %}
+		</div>
+
+		{% for article in articles %}
+			{% include "articlebox.inc" %}
+		{% endfor %}
+
+		<div class="datenav" id="datenav-bottom">
+			{% if older %}
+				<div class="date-older">
+					<a href="/till/{{ older }}{{q}}"
+					>« Older articles</a>
+				</div>
+			{% endif %}
+			{% if newer %}
+				<div class="date-newer">
+					<a href="/since/{{ newer }}{{q}}"
+					>Newer articles »</a>
+				</div>
+			{% endif %}
+		</div>
 	</div>
-	{% include 'infobox.inc' %}
+	<div id="tweets" class="mini">
+		<h2><a href="/recent{{q}}">Recently posted</a></h2>
+		{% for tweet in tweets %}
+			{% include "tweetbox.inc" %}
+		{% endfor %}
+	</div>
 {% endblock %}
+
+{% comment %}
+	{% extends "master.tmpl" %}
+
+	{% block title %}Column timeline | toss140.net{% endblock %}
+
+	{% block content %}
+		<div id="articles">
+		<h2>Column timeline</h2>
+		{% for article in articles %}
+			{% include 'articlebox.inc' %}
+		{% endfor %}
+		</div>
+		{% include 'infobox.inc' %}
+	{% endblock %}
+{% endcomment %}
