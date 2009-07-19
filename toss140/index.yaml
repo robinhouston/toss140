@@ -17,7 +17,7 @@ indexes:
   - name: date
     direction: desc
 
-# Used 3 times in query history.
+# Used 5 times in query history.
 - kind: Article
   properties:
   - name: author
@@ -84,7 +84,7 @@ indexes:
   - name: added_at
     direction: desc
 
-# Used 2463 times in query history.
+# Used 2465 times in query history.
 - kind: Tweet
   properties:
   - name: article
