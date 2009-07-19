@@ -4,7 +4,7 @@
 
 {% block content %}
 	<div id="articles">
-	<h2>From {{organ}}</h2>
+	<h2>From {{ organ }}</h2>
 	{% for article in articles %}
 		{% include 'articlebox.inc' %}
 	{% endfor %}
