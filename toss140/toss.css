@@ -185,6 +185,7 @@ h2 a:visited, h2 a:link {
 }
 #articles {
 	margin-bottom: 10px;
+	background: white;
 }
 #about h2 {
 	color: #3cf;
