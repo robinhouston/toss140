@@ -151,7 +151,6 @@ def clear_cache(key, value=None):
 
 def refresh_caches(tweet):
   '''Clear any cached pages that have changed as a result of the addition of this tweet.'''
-  clear_cache("front")
   clear_cache("timeline")
   clear_cache("recent")
   
