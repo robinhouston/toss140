@@ -60,21 +60,9 @@ a.admin {
 	color: #600;
 	line-height: 130%;
 	padding: .8em .8em .8em .8em;
-/*	border: 1px dotted #eee;
-	border-style: solid;
-*/	-webkit-box-shadow: -1px 1px 6px #bcc;
-	-moz-box-shadow: -1px 1px 4px #acc;
-/*	border-top-color: #eee;
-	border-right-color: #eee;
-	border-bottom-color: #cff;
-	border-left-color: #cff;
-	border-top-width: 0;
-	border-right-width: 0;
-	border-bottom-width: 2px;
-	border-left-width: 2px;
-*//*	-moz-border-radius: 1em;
-	-webkit-border-radius: 1em;
-*/}
+	-webkit-box-shadow: -1px 1px 6px #bcc;
+	-moz-box-shadow: -1px 1px 6px #bcc;
+}
 #tr a:link, #tr a:visited {
 	color: inherit;
 }
