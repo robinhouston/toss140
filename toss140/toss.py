@@ -14,6 +14,7 @@ import data
 
 DEBUG = True
 FETCH_SIZE = 20
+DAYS_PER_PAGE = 7
 
 TEMPLATES = os.path.join(os.path.dirname(__file__), 'templates')
 
@@ -35,45 +36,39 @@ def articles_by_site(site, n=FETCH_SIZE):
 def articles_by_author(author, n=FETCH_SIZE):
   return data.Article.all().filter('author =', author).order('-date').order('-added_at').fetch(n)
 
-def latest_articles(n=FETCH_SIZE):
-  '''Fetch the latest articles.
-  
-  Always get at least n articles if possible, and always include all the articles for
-  each day.
-  '''
-  n_articles_back = data.Article.all().order('-date').fetch(limit=1, offset=n-1)
-  if not n_articles_back:
-    return data.Article.all().order('-date').order('-added_at').fetch(n)
-  else:
-    date = n_articles_back[0].date
-    return data.Article.all().filter('date >=', date).order("-date").order('-added_at').fetch(1000)
-
-
 def articles_on_date(date, n=FETCH_SIZE):
   logging.info("fetching articles for date = %s", str(date))
   return data.Article.all().filter('date =', date).order("-date").order('-added_at').fetch(n)
 
-def articles_till_date(date, n=FETCH_SIZE):
-  n_articles_back = data.Article.all().filter('date <=', date).order('-date').fetch(limit=1, offset=n-1)
-  if not n_articles_back:
-    return data.Article.all().filter('date <=', date).order("-date").order('-added_at').fetch(n)
-  else:
-    return data.Article.all() \
-      .filter('date <=', date) \
-      .filter('date >=', n_articles_back[0].date) \
-      .order("-date").order('-added_at') \
-      .fetch(1000)
+def _for_days(d, it):
+  articles = []
+  prev_date = None
+  article_index = 0
 
-def articles_since_date(date, n=FETCH_SIZE):
-  n_articles_forward = data.Article.all().filter('date >=', date).order('date').fetch(limit=1, offset=n-1)
-  if not n_articles_forward:
-    return data.Article.all().filter('date >=', date).order("-date").order('-added_at').fetch(n)
-  else:
-    return data.Article.all() \
-      .filter('date >=', date) \
-      .filter('date <=', n_articles_forward[0].date) \
-      .order("-date").order('-added_at') \
-      .fetch(1000)
+  for article in it:
+    if article.date != prev_date:
+      article_index += 1
+      if article_index > d:
+        break
+    articles.append(article)
+    prev_date = article.date
+
+  return articles
+
+def latest_articles(d=DAYS_PER_PAGE):
+  '''Fetch the latest articles.
+  
+  Get all the articles published in the last d days, counting only days
+  for which we have at least one article. The articles are returned in
+  reverse chronological order.
+  '''
+  return _for_days(d=d, it=data.Article.all().order('-date').order('-added_at'))
+
+def articles_till_date(date, d=DAYS_PER_PAGE):
+  return _for_days(d=d, it=data.Article.all().filter('date <=', date).order('-date').order('-added_at'))
+
+def articles_since_date(date, d=DAYS_PER_PAGE):
+  return _for_days(d=d, it=data.Article.all().filter('date >=', date).order('date').order('added_at'))[::-1]
 
 def date_before(date):
   article_before = data.Article.all().filter('date <', date).order("-date").get()
