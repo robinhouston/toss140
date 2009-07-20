@@ -14,14 +14,11 @@
 	{%endif%}
 	-->
 	<script type='text/javascript'>
-		var is_dark = true;
+		var type = 0;
+		var mastheads = ['toss_140', 'toss_140blue', 'toss140_gothic', 'toss140_gothic_dark', 'toss140_anm'];
 		function flip_masthead() {
-			if (is_dark) {
-				document.getElementById("masthead").src = "/img/toss140_gothic.png";
-			} else {
-				document.getElementById("masthead").src = "/img/toss140_gothic_dark.png";
-			}
-			is_dark = !is_dark;
+			document.getElementById("masthead").src = "/img/" + mastheads[type] + '.png';
+			type = (type + 1) % mastheads.length;
 			return false;
 		}
 	</script>
