@@ -280,15 +280,6 @@ class TimelineHandler(PageHandler):
     else:
       return "timeline=" + direction + '-' + date
 
-  def memcache_time(self, direction=None, date=None):
-    # Set an explicit timeout on the timeline-since/till pages, because it's
-    # tricky to expire these manually when a tweet is added. (How do you
-    # know which keys are affected?)
-    if date:
-      return 900
-    else:
-      return 0
-
   def template_path(self):
     return TIMELINE_TEMPLATE
 
