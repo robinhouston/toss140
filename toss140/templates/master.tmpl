@@ -16,8 +16,11 @@
 	<script type='text/javascript'>
 		var type = 0;
 		var mastheads = ['toss_140', 'toss_140blue', 'toss140_gothic', 'toss140_gothic_dark', 'toss140_anm'];
+		var margins   = [ 100,        100,            0,                0,                     0           ];
 		function flip_masthead() {
-			document.getElementById("masthead").src = "/img/" + mastheads[type] + '.png';
+			var i = document.getElementById("masthead");
+			i.src = "/img/" + mastheads[type] + '.png';
+			i.style.marginLeft = margins[type] + 'px';
 			type = (type + 1) % mastheads.length;
 			return false;
 		}
