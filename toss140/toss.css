@@ -59,8 +59,9 @@ a.admin {
 	color: #600;
 	line-height: 130%;
 	padding: .8em .8em .8em .8em;
-	-webkit-box-shadow: -1px 1px 6px #bcc;
-	-moz-box-shadow: -1px 1px 6px #bcc;
+	border: 1px solid #ccc;
+	-webkit-box-shadow: -1px 1px 6px #ccc;
+	-moz-box-shadow: -1px 1px 6px #ccc;
 }
 #tr a:link, #tr a:visited {
 	color: #600;
