@@ -73,7 +73,7 @@ def scrape_express(content):
 def scrape_mail(content):
   r = {}
 
-  mo = re.search(r'''class="author" rel="nofollow">([^<]+)</a>\s*<br>(?:\s*</p>\s*<p>\s*)?\s*Last updated at \d\d?:\d\d? [AP]M on (\d\d?)(st|nd|rd|th)( [A-Z][a-z]+ \d\d\d\d)''', content)
+  mo = re.search(r'''class="author" rel="nofollow">\s*([^<]+\S)\s*</a>\s*<br>(?:\s*</p>\s*<p>\s*)?\s*Last updated at \d\d?:\d\d? [AP]M on (\d\d?)(st|nd|rd|th)( [A-Z][a-z]+ \d\d\d\d)''', content)
   if mo:
     r['author'] = mo.group(1)
     r['date'] = datetime.datetime.strptime(mo.group(2) + mo.group(4), '%d %B %Y').date()
