@@ -101,7 +101,7 @@ def scrape_cnet(content):
   return r
 
 def scrape_independent(content):
-  # Only works for /opinion/commentators at the moment
+  # Author extraction only works for /opinion/commentators at the moment
   r = {}
   
   mo_date = re.search(r'<meta name="icx_pubdate" content="(\d\d/\d\d/\d\d\d\d)"/>', content)
@@ -113,6 +113,10 @@ def scrape_independent(content):
     if mo_commentator:
       r['author'] = mo_commentator.group(1)
   
+  mo_title = re.search(r'<meta name="proximic_title" content="([^"]+)"/>')
+  if mo_title:
+    r['title'] = mo_title.group(1)
+
   return r
 
 def scrape_telegraph(content):
