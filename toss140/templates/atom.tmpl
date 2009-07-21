@@ -13,6 +13,7 @@
 		<entry>
 			<id>http://toss140.net/tweet/{{ tweet.key.name }}</id>
 			<title type="text">{{ tweet.text|escape }}</title>
+			<published>{{ tweet.created_at|date:"Y-m-d\TH:i:s\Z" }}</published>
 			<updated>{{ tweet.created_at|date:"Y-m-d\TH:i:s\Z" }}</updated>
 
 			<author>
@@ -25,8 +26,13 @@
 						&lt;p&gt;&lt;/p&gt;
 						&lt;p&gt;
 							– &lt;i&gt;{{ tweet.article.title|escape }}&lt;/i&gt;,
-							{{ tweet.article.author|escape }},
+							{% if tweet.article.author %}
+								{{ tweet.article.author|escape }},
+							{% endif %}
 							{{ tweet.article.parent.name|escape }}
+							{% if tweet.article.date %}
+								{{ tweet.article.date|date:"D jS F Y" }},
+							{% endif %}
 						&lt;/p&gt;
 					{% endif %}
 					&lt;p&gt;&lt;/p&gt;
