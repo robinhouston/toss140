@@ -21,7 +21,7 @@
 				<uri>http://twitter.com/{{ tweet.from_user|urlencode }}</uri>
 			</author>
 			<content type="html">
-					&lt;p&gt;&amp;#8220;{{ tweet.text|escape }}&amp;#8221;&lt;/p&gt;
+					&lt;p&gt;&amp;#8220;{{ tweet.text|escape|escape }}&amp;#8221;&lt;/p&gt;
 					{% if tweet.article %}
 						&lt;p&gt;&lt;/p&gt;
 						&lt;p&gt;
