@@ -173,11 +173,16 @@ class PageHandler(webapp.RequestHandler):
       content = template.render(template_path, template_args)
       memcache.add(key=memcache_key, value=content, time=self.memcache_time(*args))
 
+    self.response.headers['Content-type'] = self.content_type()
     self.response.out.write(content)
   
   def memcache_time(*args):
     '''The default is no timeout.'''
     return 0
+  
+  def content_type(self):
+    '''The content type. Default is text/html.'''
+    return 'text/html'
 
 class AuthorHandler(PageHandler):
   def memcache_key(self, author):
@@ -285,6 +290,9 @@ class FeedHandler(PageHandler):
     return {
       "tweets": recent_tweets(1000)
     }
+  
+  def content_type(self):
+    return 'application/atom+xml'
 
 class TimelineHandler(PageHandler):
   def memcache_key(self, direction=None, date=None):
