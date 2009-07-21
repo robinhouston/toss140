@@ -5,6 +5,10 @@ import logging
 def scrape_guardian(content):
   r = {}
   
+  mo_title = re.search(r's.pageName="(.*):Article:', content)
+  if mo_title:
+    r['title'] = re.sub(r'\s+\| .*', '', mo_title.group(1))
+  
   mo_date = re.search(r'<meta name="DC.date.issued" content="(\d\d\d\d)-(\d\d)-(\d\d)">', content)
   if mo_date:
     r['date'] = datetime.date(*map(int,mo_date.groups()))
