@@ -1,6 +1,9 @@
 {% extends "master.tmpl" %}
 
 {% block title %}toss140.net – comment on the commentators{% endblock %}
+{% block head %}
+	<link rel="alternate" type="application/atom+xml" title="Atom feed" href="/atom.xml" />
+{% endblock %}
 
 {% block content %}
 	<div id="articles">

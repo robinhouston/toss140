@@ -20,6 +20,7 @@ TEMPLATES = os.path.join(os.path.dirname(__file__), 'templates')
 
 ABOUT_TEMPLATE     = os.path.join(TEMPLATES, 'about.tmpl')
 TIMELINE_TEMPLATE  = os.path.join(TEMPLATES, 'timeline.tmpl')
+ATOM_TEMPLATE      = os.path.join(TEMPLATES, 'atom.tmpl')
 RECENT_TEMPLATE    = os.path.join(TEMPLATES, 'recent.tmpl')
 
 AUTHOR_TEMPLATE    = os.path.join(TEMPLATES, 'author.tmpl')
@@ -273,6 +274,18 @@ class AboutHandler(PageHandler):
   def template_args(self):
     return {}
 
+class FeedHandler(PageHandler):
+  def template_path(self):
+    return ATOM_TEMPLATE
+
+  def memcache_key(self):
+    return "feed"
+
+  def template_args(self):
+    return {
+      "tweets": recent_tweets(1000)
+    }
+
 class TimelineHandler(PageHandler):
   def memcache_key(self, direction=None, date=None):
     if date is None:
@@ -308,6 +321,7 @@ def main():
     ('/login',             LoginHandler),
                            
     ('/',                  TimelineHandler),
+    ('/atom.xml',          FeedHandler),
     ('/about',             AboutHandler),
     ('/(since|till)/(.+)', TimelineHandler),
     ('/recent',            RecentHandler),
