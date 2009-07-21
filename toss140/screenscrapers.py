@@ -106,7 +106,7 @@ def scrape_independent(content):
   
   mo_date = re.search(r'<meta name="icx_pubdate" content="(\d\d/\d\d/\d\d\d\d)"/>', content)
   if mo_date:
-    r['date'] = datetime.datetime.strptime(mo_date.group(1), '%d/%m/%Y').date()
+    r['date'] = datetime.datetime.strptime(mo_date.group(1), '%m/%d/%Y').date()
   
   if re.search(r'''var contextName = 'independent_www_opinion_commentators';''', content):
     mo_commentator = re.search(r'<meta name="icx_section" content="([^"]+)"/>', content)
