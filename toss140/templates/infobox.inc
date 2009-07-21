@@ -6,7 +6,7 @@
 	<p>Just twitter your summary, and include a link to the piece you're summarising (shortened is fine, we are very clever). As long as you include the hashtag <code>#toss140</code>, we will find your tweet and the web site will do the rest, deducing the author name, the newspaper title, the date, etc.</p>
 
 	<h2>How can I keep up with new posts?</h2>
-	<p>You can <a href="http://twitter.com/toss140">follow us on Twitter</a>. All new summaries are automatically posted to the Twitter account <a href="http://twitter.com/toss140">toss140</a>.</p>
+	<p>You can <a href="http://twitter.com/toss140">follow us on Twitter</a>. All new summaries are automatically posted to the Twitter account <a href="http://twitter.com/toss140">toss140</a>. There's also an <a href="/atom.xml">Atom feed</a>.</p>
 	
 	<h2>Any other questions?</h2>
 	<p>See the <a href="/about{{q}}">information page</a>.
