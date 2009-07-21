@@ -1,5 +1,5 @@
 application: toss140
-version: test
+version: 2
 runtime: python
 api_version: 1
 
