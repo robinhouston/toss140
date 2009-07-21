@@ -4,7 +4,7 @@
 
 {% block content %}
 	<div id="articles">
-	<h2>From <a onclick="pageTracker._trackPageview('/outbound/site/{{ site.name|urlencode }}');"
+	<h2>From <a onclick="pageTracker._trackPageview('/outbound/site/{{ site.name|urlenc_uni }}');"
 		href="http://{{ site.host }}/">{{ site.name }}</a></h2>
 	{% for article in articles %}
 		{% include 'articlebox.inc' %}

@@ -21,17 +21,17 @@
 		<div class="author">
 			– {%if article.author%}
 					<a
-						href="/author/{{ article.author|urlencode }}{{q}}"
+						href="/author/{{ article.author|urlenc_uni }}{{q}}"
 						>{{ article.author|escape }}</a>,
 				{%else%}
 					author unknown,
 				{%endif%}
 			<a
-				href="/organ/{{ article.parent.name|urlencode }}{{q}}"
+				href="/organ/{{ article.parent.name|urlenc_uni }}{{q}}"
 				>{{ article.parent.name|escape }}</a>
 			{%if admin%}
 				<a class="admin"
-					href="/admin/datastore/edit?key={{ article.key }}&amp;kind=Article&amp;next={{ refresh_url|urlencode }}"
+					href="/admin/datastore/edit?key={{ article.key }}&amp;kind=Article&amp;next={{ refresh_url|urlenc_uni }}"
 					>e</a>
 			{%endif%}
 		</div>

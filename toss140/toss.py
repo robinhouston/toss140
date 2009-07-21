@@ -3,6 +3,7 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from google.appengine.api import users
 from google.appengine.api import memcache
+import django.template.defaultfilters
 
 import datetime
 import logging
@@ -30,6 +31,11 @@ DATE_TEMPLATE      = os.path.join(TEMPLATES, 'date.tmpl')
 LINKLESS_TEMPLATE  = os.path.join(TEMPLATES, 'linkless.tmpl')
 
 VERSION, MINOR_VERSION = os.environ.get('CURRENT_VERSION_ID').split('.')
+
+
+"""Load custom Django template filters"""
+webapp.template.register_template_library('filters')
+
 
 def articles_by_site(site, n=FETCH_SIZE):
   return data.Article.all().ancestor(site).order('-date').order('-added_at').fetch(n)
@@ -127,7 +133,7 @@ class PageHandler(webapp.RequestHandler):
     if string is None:
       return None
     else:
-      return urllib.unquote(string)
+      return urllib.unquote(string).decode('utf-8')
   
   def get(self, *args):
     args = map(self._unquote, args)

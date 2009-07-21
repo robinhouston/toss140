@@ -13,13 +13,13 @@
 					href="http://twitter.com/{{tweet.from_user}}/status/{{tweet.id}}{{q}}"
 				>{{tweet.raw_text|escape}}</a>
 				{%if admin%}
-					<a class="admin" href="/admin/datastore/edit?key={{tweet.key}}&amp;kind=Tweet&amp;next={{refresh_url|urlencode}}">e</a>
+					<a class="admin" href="/admin/datastore/edit?key={{tweet.key}}&amp;kind=Tweet&amp;next={{refresh_url|urlenc_uni}}">e</a>
 					<a class="admin" href="/do/index-tweet?key={{tweet.key}}">r</a>
 				{%endif%}
 				<div class="tweet-date">–&nbsp;{{tweet.created_at|date:"D jS F Y, H:i:s"}}
 				<div class="tweeter"><a
-					onclick="javascript:pageTracker._trackPageview('/outbound/tweeter/{{ tweet.from_user|urlencode }}');"
-					href="http://twitter.com/{{ tweet.from_user|urlencode }}">{{tweet.from_user}}</a></div>
+					onclick="javascript:pageTracker._trackPageview('/outbound/tweeter/{{ tweet.from_user|urlenc_uni }}');"
+					href="http://twitter.com/{{ tweet.from_user|urlenc_uni }}">{{tweet.from_user}}</a></div>
 				</div>
 			</div>
 		</div>

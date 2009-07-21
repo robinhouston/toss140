@@ -11,12 +11,12 @@
 		{% endif %}
 		{%if admin%}
 			<a class="admin"
-				href="/admin/datastore/edit?key={{ tweet.key }}&amp;kind=Tweet&amp;next={{ refresh_url|urlencode }}">e</a>
+				href="/admin/datastore/edit?key={{ tweet.key }}&amp;kind=Tweet&amp;next={{ refresh_url|urlenc_uni }}">e</a>
 			<a class="admin" href="/do/index-tweet?key={{ tweet.key }}">r</a>
 		{%endif%}
 		<div class="tweeter">
 			<a title="All summaries by {{ tweet.from_user|escape }}"
-				href="/tweeter/{{ tweet.from_user|urlencode }}{{q}}"
+				href="/tweeter/{{ tweet.from_user|urlenc_uni }}{{q}}"
 				>{{ tweet.from_user|escape }}</a>
 			<a class="tau"
 				title="This summary on Twitter"
