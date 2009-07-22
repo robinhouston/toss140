@@ -38,7 +38,7 @@ def scrape_times(content):
 
   return r
 
-def scrape_bbc(content):
+def scrape_bbc_news(content):
   r = {}
 
   mo_title = re.search(r'(?s)<title>(.*?)\s*</title>', content)
@@ -223,7 +223,7 @@ def scrape_spectator(content):
 scrapers = {
   "guardian.co.uk":     scrape_guardian,
   "independent.co.uk":  scrape_independent,
-  "news.bbc.co.uk":     scrape_bbc,
+  "news.bbc.co.uk":     scrape_bbc_news,
   "timesonline.co.uk":  scrape_times,
   "dailyexpress.co.uk": scrape_express,
   "dailymail.co.uk":    scrape_mail,
