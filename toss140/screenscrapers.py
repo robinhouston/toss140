@@ -117,7 +117,7 @@ def scrape_independent(content):
     if mo_commentator:
       r['author'] = mo_commentator.group(1)
   
-  mo_title = re.search(r'<meta name="proximic_title" content="([^"]+)"/>')
+  mo_title = re.search(r'<meta name="proximic_title" content="([^"]+)"/>', content)
   if mo_title:
     r['title'] = mo_title.group(1)
 
