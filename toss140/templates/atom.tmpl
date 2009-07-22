@@ -36,11 +36,11 @@
 						&lt;/p&gt;
 					{% endif %}
 					&lt;p&gt;&lt;/p&gt;
-					&lt;p&gt;
+					&lt;p&gt;&lt;small&gt;
 						Posted by &lt;a href=&quot;http://twitter.com/{{ tweet.from_user|escape }}&quot;&gt;{{ tweet.from_user|escape }}&lt;/a&gt;
 						from {{ tweet.source|escape }}
 						at {{ tweet.created_at|date:"H:i o\n l jS M Y" }}
-					&lt;/p&gt;
+					&lt;/small&gt;&lt;/p&gt;
 			</content>
 			<summary type="text">
 				{{ tweet.text|escape }}
