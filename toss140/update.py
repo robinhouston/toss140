@@ -9,6 +9,7 @@ import dateutil.parser
 from django.utils import simplejson
 from google.appengine.api import memcache
 from google.appengine.api.labs import taskqueue
+from google.appengine.api import urlfetch
 from google.appengine.ext import db
 from google.appengine.ext import webapp
 import wsgiref.handlers
@@ -91,21 +92,58 @@ def text_from_raw_text(raw_text):
 
   return text
 
+def _simple_fetch(url, method = 'GET'):
+  logging.info('Fetching ' + url)
+  return urlfetch.fetch(
+    url = url,
+    follow_redirects = False,
+    deadline = 10,
+    allow_truncated = True,
+    method = method,
+  )
+
+def _fetch(url):
+  response = _simple_fetch(url)
+  while response.status_code in range(300, 399):
+    location = response.headers['Location']
+    if location[0] == '/':
+      mo_url = re.match(r'(https?://[^/]+)', url)
+      if mo_url:
+        url = mo_url.group(1) + location
+      else:
+        raise Exception("Don't know what to do with location: " + location)
+    else:
+      url = location
+    if url is None:
+      raise Exception('Found a redirect response with no Location')
+    response = _fetch(url)
+
+  if response.status_code not in (200, 300):
+    raise Exception('Error response ' + response.status_code + ' from ' + url)
+  
+  setattr(response, 'url', url)
+  return response
+
 def index(tweet):
   tweet.text = text_from_raw_text(tweet.raw_text)
   tweet.is_retweet = bool(re.search(r'(?i)\bRT\b|\(via @', tweet.text))
   
   if tweet.short_url is not None:
-    fh_url = urllib.urlopen(tweet.short_url)
-    tweet.long_url = fh_url.geturl()
-    tweet.article = article(fh_url)
-    fh_url.close()
+    response = _fetch(tweet.short_url)
+    if re.match(r'^http://digg.com/', response.url):
+      mo_url = re.search(r'<h1 id="title">\s*<a href="([^"]+)', response.content)
+      if mo_url:
+        response = _fetch(mo_url.group(1))
+      else:
+        raise Exception('Failed to find target URL in digg page ' + response.url)
+    tweet.long_url = response.url
+    tweet.article = article(response)
 
   tweet.put()
   refresh_caches(tweet)
 
-def article(fh):
-  url = fh.geturl()
+def article(response):
+  url = response.url
   article = data.Article.get_by_key_name(url)
 
   if article is None:
@@ -113,12 +151,12 @@ def article(fh):
     site = data.get_site(host)
     title = None
 
-    content_bytes = fh.read(32767)
     try:
-      content = content_bytes.decode('utf-8')
+      content = response.content.decode('utf-8')
     except UnicodeDecodeError:
       logging.debug("Content could not be interpreted as UTF-8, trying ISO-8859-1")
-      content = content_bytes.decode('ISO-8859-1')
+      content = response.content.decode('ISO-8859-1')
+
     mo = re.search(r'(?s)<title>(.*?)</title>', content)
     if mo:
       title = mo.group(1)
