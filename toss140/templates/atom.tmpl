@@ -45,7 +45,11 @@
 			<summary type="text">
 				{{ tweet.text|escape }}
 			</summary>
-			<link rel="alternate" href="http://twitter.com/{{ tweet.from_user|escape }}/status/{{ tweet.id }}" />
+			{% if tweet.article.url %}
+				<link rel="alternate" href="{{ tweet.article.url|escape }}" />
+			{% else %}
+				<link rel="alternate" href="http://twitter.com/{{ tweet.from_user|escape }}/status/{{ tweet.id }}" />
+			{% endif %}
 		</entry>
 	{% endfor %}
 </feed>
