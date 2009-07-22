@@ -237,20 +237,38 @@ def scrape_wsj(content):
   
   return r
 
+def scrape_dublin_core(content):
+  r = {}
+  
+  mo_date = re.search(r'dc:date="(\d\d\d\d-\d\d-\d\d)T', content)
+  if mo_date:
+    r['date'] = datetime.datetime.strptime(mo_date.group(1), '%Y-%m-%d').date()
+  
+  mo_author = re.search(r'dc:creator="([^"]+)"', content)
+  if mo_author:
+    r['author'] = mo_author.group(1).title()
+
+  mo_title = re.search(r'dc:title="([^"]+)"', content)
+  if mo_title:
+    r['title'] = mo_title.group(1)
+
+  return r
+
 scrapers = {
-  "guardian.co.uk":     scrape_guardian,
-  "independent.co.uk":  scrape_independent,
-  "news.bbc.co.uk":     scrape_bbc_news,
-  "timesonline.co.uk":  scrape_times,
-  "dailyexpress.co.uk": scrape_express,
-  "dailymail.co.uk":    scrape_mail,
-  "telegraph.co.uk":    scrape_telegraph,
-  "blogs.telegraph.co.uk": scrape_telegraph_blogs,
-  "news.cnet.com":      scrape_cnet,
-  "newscientist.com":   scrape_newscientist,
-  "irishtimes.com":     scrape_irishtimes,
-  "spectator.co.uk":    scrape_spectator,
-  "online.wsj.com":     scrape_wsj,
+  "guardian.co.uk":          scrape_guardian,
+  "independent.co.uk":       scrape_independent,
+  "news.bbc.co.uk":          scrape_bbc_news,
+  "timesonline.co.uk":       scrape_times,
+  "dailyexpress.co.uk":      scrape_express,
+  "dailymail.co.uk":         scrape_mail,
+  "telegraph.co.uk":         scrape_telegraph,
+  "blogs.telegraph.co.uk":   scrape_telegraph_blogs,
+  "news.cnet.com":           scrape_cnet,
+  "newscientist.com":        scrape_newscientist,
+  "irishtimes.com":          scrape_irishtimes,
+  "spectator.co.uk":         scrape_spectator,
+  "online.wsj.com":          scrape_wsj,
+  "blogs.dailyrecord.co.uk": scrape_dublin_core,
 }
 
 def scrape(host, content):
