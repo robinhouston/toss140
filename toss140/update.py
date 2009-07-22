@@ -42,10 +42,13 @@ def new_tweets_from_origin(origin):
 
   return results
 
-def store_tweet(tweet):
+def store_tweet(tweet, ignore_link = False):
   logging.info("Storing tweet: %s", tweet)
   raw_text = html_unescape(tweet['text'])
-  short_url = extract_url(raw_text)
+  if ignore_link:
+    short_url = None
+  else:
+    short_url = extract_url(raw_text)
   twid = long(tweet['id'])
   to_user_id = None
   try:
@@ -295,20 +298,40 @@ class UpdateHandler(webapp.RequestHandler):
       self.response.out.write(message + "\n")
 
 class AddTweetHandler(webapp.RequestHandler):
-  _queue   = taskqueue.Queue(name='retweet')
+  _retweet_queue   = taskqueue.Queue(name='retweet')
+  _retry_queue     = taskqueue.Queue(name='add-tweet-retry')
 
   def post(self):
     tweet = {}
     for k, v in self.request.params.iteritems():
       tweet[str(k)] = unicode(v)
     logging.debug("add-tweet: storing %s", tweet)
-    stored_tweet = store_tweet(tweet)
+    try:
+      stored_tweet = store_tweet(tweet)
+    except Exception:
+      if 'retries' in tweet:
+        tweet['retries'] = long(tweet['retries']) + 1
+      else:
+        tweet['retries'] = 1
+
+      if tweet['retries'] > 10:
+        logging.exception("Failed after 10 attempts, storing without link")
+        store_tweet(tweet, ignore_link = True)
+      else:
+        logging.exception("Failed to store tweet; requeuing in the retry queue (%d)" %  tweet['retries'])
+        task = taskqueue.Task(
+          url='/do/add-tweet', countdown = 300 * tweet['retries'],
+          method='POST', params=tweet
+        )
+        self._retry_queue.add(task)
+
+      return
     
     task = taskqueue.Task(
       url='/do/retweet', countdown=0, method='POST',
       params={'key': stored_tweet.key()}
     )
-    self._queue.add(task)
+    self._retweet_queue.add(task)
 
 class IndexTweetsHandler(webapp.RequestHandler):
   

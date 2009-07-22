@@ -1,6 +1,8 @@
 queue:
   - name: add-tweet
     rate: 1/s
+  - name: add-tweet-retry
+    rate: 1/m
   - name: index-tweet
     rate: 1/s
   - name: retweet

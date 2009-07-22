@@ -104,7 +104,7 @@ indexes:
   - name: is_retweet
   - name: long_url
 
-# Unused in query history -- copied from input.
+# Used once in query history.
 - kind: Tweet
   properties:
   - name: long_url
