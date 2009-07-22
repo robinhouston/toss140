@@ -29,17 +29,17 @@
 							{% if tweet.article.author %}
 								{{ tweet.article.author|escape }},
 							{% endif %}
-							{{ tweet.article.parent.name|escape }}
-							{% if tweet.article.date %}
-								{{ tweet.article.date|date:"D jS F Y" }},
+							{{ tweet.article.parent.name|escape }}<!--
+							-->{% if tweet.article.date %},
+								{{ tweet.article.date|date:"D jS F Y" }}
 							{% endif %}
 						&lt;/p&gt;
 					{% endif %}
 					&lt;p&gt;&lt;/p&gt;
 					&lt;p&gt;
-						Posted by {{ tweet.from_user|escape }}
-						at {{ tweet.created_at }}
+						Posted by &lt;a href=&quot;http://twitter.com/{{ tweet.from_user|escape }}&quot;&gt;{{ tweet.from_user|escape }}&lt;/a&gt;
 						from {{ tweet.source|escape }}
+						at {{ tweet.created_at|date:"H:i o\n l jS M Y" }}
 					&lt;/p&gt;
 			</content>
 			<summary type="text">
