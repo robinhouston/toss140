@@ -112,9 +112,9 @@ def parse_iso_date(datestr):
     raise NotFound
   return datetime.date(*map(int, mo.groups()))
 
-class LoginHandler(webapp.RequestHandler):
+class AdminLoginHandler(webapp.RequestHandler):
   # This handler just redirects to the supplied URL.
-  # The point is that /login as specified as login: admin in app.yaml,
+  # The point is that /adminlogin as specified as login: admin in app.yaml,
   # so App Engine will make the user log in before we even get here.
   def get(self):
     url = self.request.get("r")
@@ -138,7 +138,7 @@ class PageHandler(webapp.RequestHandler):
     args = map(self._unquote, args)
     admin = self.request.get('admin')
     if admin and not users.is_current_user_admin():
-      self.redirect("/login?r=" + urllib.quote(self.request.uri))
+      self.redirect("/adminlogin?r=" + urllib.quote(self.request.uri))
     
     memcache_key = 'v' + VERSION + ':' + self.memcache_key(*args)
 
@@ -331,7 +331,7 @@ class TimelineHandler(PageHandler):
 
 def main():
   application = webapp.WSGIApplication([
-    ('/login',             LoginHandler),
+    ('/adminlogin',        AdminLoginHandler),
                            
     ('/',                  TimelineHandler),
     ('/atom.xml',          FeedHandler),

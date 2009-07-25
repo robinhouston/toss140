@@ -68,8 +68,8 @@ handlers:
   static_files: \1
   upload: js/.*\.js
 
-- url: /login
-  login: admin
+- url: /adminlogin
+  login: admin # DO NOT REMOVE
   script: toss.py
 
 - url: /admin(/.*)?
