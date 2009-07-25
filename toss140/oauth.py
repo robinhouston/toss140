@@ -25,10 +25,8 @@ class OAuth(object):
     self.consumer_secret = consumer_secret
 
   def _signature(self, url, params, method='POST', secret=''):
-    string_to_sign = method + '&' + escape(url) + '&' + escape(urlencode(params))
     key = self.consumer_secret + '&' + secret
-    print "Signing string: " + string_to_sign
-    print "With key: " + key
+    string_to_sign = method + '&' + escape(url) + '&' + escape(urlencode(params))
     return base64.b64encode(hmac.new(key, string_to_sign, hashlib.sha1).digest())
 
   def _params(self, url, token=None, secret='', *args):
@@ -41,8 +39,8 @@ class OAuth(object):
 
     if token:
       params.append(("oauth_token", token))
-    params.append( ("oauth_signature", self._signature(url, params, secret=secret)) )
     params.append(*args)
+    params.append( ("oauth_signature", self._signature(url, params, secret=secret)) )
     return urllib.urlencode(params)
 
   def oauth_request(self, url, *args, **kwargs):
