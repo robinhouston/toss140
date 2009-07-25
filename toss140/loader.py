@@ -36,6 +36,10 @@ class DestinationLoader(bulkloader.Loader):
         ('api_url', str),
         ('username', str),
         ('password', str),
+        ('consumer_key', str),
+        ('consumer_secret', str),
+        ('oauth_token', str),
+        ('oauth_token_secret', str),
       ])
   def generate_key(self, i, values):
     return values[1] + '#' + values[0]
@@ -47,6 +51,10 @@ class DestinationExporter(bulkloader.Exporter):
         ('api_url',  str, None),
         ('username', str, None),
         ('password', str, None),
+        ('consumer_key', str, None),
+        ('consumer_secret', str, None),
+        ('oauth_token', str, None),
+        ('oauth_token_secret', str, None),
       ])
 
 

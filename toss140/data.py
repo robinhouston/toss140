@@ -4,6 +4,8 @@ import re
 from google.appengine.ext import db
 from google.appengine.api import memcache
 
+import oauth
+
 class Origin(db.Model):
   tag = db.StringProperty(required=True, default='toss140')
   api_url = db.LinkProperty(required=True)
@@ -12,16 +14,37 @@ class Origin(db.Model):
 
 class Destination(db.Model):
   api_url = db.LinkProperty(required=True, default='http://twitter.com/statuses/update.json')
+
   username = db.StringProperty(required=True, default='toss140')
   password = db.StringProperty(required=False, default='')
-  
-  def url_with_auth(self):
+
+  consumer_key = db.StringProperty(required=False)
+  consumer_secret = db.StringProperty(required=False)
+  oauth_token = db.StringProperty(required=False)
+  oauth_token_secret = db.StringProperty(required=False)
+
+  def _url_with_basic_auth(self):
     return self.api_url.replace('://', '://%s:%s@' % (self.username, self.password), 1)
+  
+  def post(self, message):
+    payload = ('status', message.encode('utf-8'))
+    if self.password:
+      url = self._url_with_basic_auth()
+      fh = urllib.urlopen(url, urllib.urlencode(payload))
+      response = fh.read()
+    else:
+      response = oauth.OAuth(self.consumer_key, self.consumer_secret)\
+        .oauth_request(self.api_url, self.oauth_token, self.oauth_token_secret,
+          payload)
+
+    logging.debug(response)
+    return response
 
 # The key name is the hostname of the web site
 class Site(db.Model):
   host = db.StringProperty(required=True)
   name = db.StringProperty(required=True)
+  num_summaries = db.IntegerProperty(required=True, default=0)
 
 # Every Article should have a parent that is a Site
 # The key name is the ultimate URL of the article
@@ -53,6 +76,13 @@ class Tweet(db.Model):
   origin = db.ReferenceProperty(required=True, reference_class=Origin)
   article = db.ReferenceProperty(required=False, reference_class=Article, default=None)
 
+class Tweeter(db.Model):
+  name = db.StringProperty(required=True)
+  num_summaries = db.IntegerProperty(required=True, default=0)
+
+class Author(db.Model):
+  name = db.StringProperty(required=True)
+  num_summaries = db.IntegerProperty(required=True, default=0)
 
 def get_origins():
   origins = Origin.all().fetch(16)

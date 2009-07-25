@@ -373,13 +373,8 @@ class ReTweetHandler(webapp.RequestHandler):
     else:
       truncated_text = tweet.text[: 140 - len(suffix) - 1] + u'\u2026'
 
-    post_data = urllib.urlencode({
-      "status": (truncated_text + suffix).encode('utf-8'),
-    })
     for destination in data.Destination.all():
-      fh = urllib.urlopen(destination.url_with_auth(), post_data)
-      logging.debug(fh.read())
-      fh.close()
+      destination.post(truncated_text + suffix)
 
 def main():
   application = webapp.WSGIApplication([
