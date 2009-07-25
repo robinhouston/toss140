@@ -39,7 +39,7 @@ class OAuth(object):
 
     if token:
       params.append(("oauth_token", token))
-    params.append(*args)
+    params += args
     params.append( ("oauth_signature", self._signature(url, params, secret=secret)) )
     return urllib.urlencode(params)
 
