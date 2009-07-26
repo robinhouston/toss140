@@ -84,6 +84,15 @@ class Author(db.Model):
   name = db.StringProperty(required=True)
   num_summaries = db.IntegerProperty(required=True, default=0)
 
+class User(db.Model):
+  id = db.IntegerProperty(required=True)
+  name = db.StringProperty(required=True)
+  screen_name = db.StringProperty(required=True)
+  profile_image_url = db.LinkProperty(required=True)
+  
+  oauth_token = db.StringProperty(required=True) # The access token
+  oauth_token_secret = db.StringProperty(required=True)
+
 def get_origins():
   origins = Origin.all().fetch(16)
   if origins:
