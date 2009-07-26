@@ -94,22 +94,7 @@ class User(db.Model):
   oauth_token_secret = db.StringProperty(required=True)
 
 def get_origins():
-  origins = Origin.all().fetch(16)
-  if origins:
-    return origins
-  twitter_origin = Origin(
-    key_name='twitter#toss140',
-    api_url='http://search.twitter.com/',
-    max_id=2597007905,
-    count=Tweet.all().count(),
-  )
-  twitter_origin.put()
-  identica_origin = Origin(
-    key_name='identica#toss140',
-    api_url='http://identi.ca/api/',
-  )
-  identica_origin.put()
-  return [twitter_origin, identica_origin]
+  return Origin.all().fetch(16)
 
 def get_site(hostname):
   site = Site.get_by_key_name(hostname)
