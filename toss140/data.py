@@ -1,5 +1,6 @@
 import logging
 import re
+import urllib
 
 from google.appengine.ext import db
 from google.appengine.api import memcache
