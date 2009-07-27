@@ -1,4 +1,4 @@
-{% if article.date %}
+{% if article.date and article.tweets.count %}
 	<div class="articlebox">
 		{% ifchanged article.date %}
 			<div class="date">

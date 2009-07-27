@@ -41,7 +41,7 @@ class Destination(db.Model):
     return self.api_url.replace('://', '://%s:%s@' % (self.username, self.password), 1)
   
   def post(self, message):
-    payload = ('status', message.encode('utf-8'))
+    payload = [ ('status', message.encode('utf-8')) ]
     if self.password:
       url = self._url_with_basic_auth()
       fh = urllib.urlopen(url, urllib.urlencode(payload))
@@ -79,7 +79,7 @@ class Article(db.Model):
   num_tweets = db.IntegerProperty(required=False)
   
   def tweets(self):
-    return Tweet.all().filter('article =', self).order('-created_at')
+    return Tweet.all().filter('article =', self).filter('is_retweet =', False).order('-created_at')
   
   def recount(self):
     self.num_tweets = len(self.tweets().fetch(1000))
