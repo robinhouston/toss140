@@ -82,6 +82,7 @@ class Article(db.Model):
   
   def recount(self):
     self.num_tweets = len(self.tweets().fetch(1000))
+    return self.num_tweets
 
 class Tweet(db.Model):
   id = db.IntegerProperty(required=True)

@@ -188,21 +188,21 @@ def refresh_caches(tweet):
   memcache.flush_all()
 
 def update_counters(tweet):
-  logging.info("Updating count for tweeter %s", tweet.from_user)
   tweeter = data.Tweeter.get_by_name(tweet.from_user)
-  tweeter.recount()
+  n = tweeter.recount()
   tweeter.put()
+  logging.info("Updated count for tweeter %s to %d", tweet.from_user, n)
   
   if tweet.article:
-    logging.info("Updating count for article")
     article = tweet.article
-    article.recount()
+    n = article.recount()
     article.put()
+    logging.info("Updated count for article to %d", n)
     
     site = article.parent()
-    logging.info("Updating count for site %s", site.name)
-    site.recount()
+    n = site.recount()
     site.put()
+    logging.info("Updated count for site %s to %d", site.name, n)
 
 def update_stats(origin, n, max_id):
   db.run_in_transaction(_update_stats, origin_key=origin.key(), n=n, max_id=max_id)
