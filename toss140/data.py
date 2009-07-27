@@ -65,7 +65,6 @@ class Site(db.Model):
       if article.num_tweets:
         n += article.num_tweets
     self.num_tweets = n
-    self.put()
     return n
 
 # Every Article should have a parent that is a Site
@@ -80,6 +79,9 @@ class Article(db.Model):
   
   def tweets(self):
     return Tweet.all().filter('article =', self).order('-created_at')
+  
+  def recount(self):
+    self.num_tweets = len(self.tweets().fetch(1000))
 
 class Tweet(db.Model):
   id = db.IntegerProperty(required=True)
