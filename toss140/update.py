@@ -143,8 +143,8 @@ def index(tweet):
     tweet.article = article(response)
 
   tweet.put()
-  refresh_caches(tweet)
   update_counters(tweet)
+  refresh_caches(tweet)
 
 def article(response):
   url = response.url
