@@ -171,7 +171,7 @@ h2 a:visited, h2 a:link {
 	margin-left: 1em;
 	color: #444;
 }
-#articles, #tweets, #about, #infobox {
+#articles, #tweets, #about, #infobox, #top {
 	float: left;
 	display: inline; /* workaround for E6 rendering bug, ignored by proper browsers */
 	background: #EFF;
@@ -184,7 +184,7 @@ h2 a:visited, h2 a:link {
 	margin-bottom: 0;
 	width: 500px;
 }
-#articles {
+#articles, #top {
 	margin-bottom: 10px;
 	background: white;
 }

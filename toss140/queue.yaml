@@ -7,3 +7,5 @@ queue:
     rate: 1/s
   - name: retweet
     rate: 1/s
+  - name: recount
+    rate: 3/m

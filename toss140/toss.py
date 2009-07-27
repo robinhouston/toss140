@@ -27,6 +27,7 @@ AUTHOR_TEMPLATE    = os.path.join(TEMPLATES, 'author.tmpl')
 TWEETER_TEMPLATE   = os.path.join(TEMPLATES, 'tweeter.tmpl')
 ORGAN_TEMPLATE     = os.path.join(TEMPLATES, 'organ.tmpl')
 DATE_TEMPLATE      = os.path.join(TEMPLATES, 'date.tmpl')
+TOP_TEMPLATE       = os.path.join(TEMPLATES, 'top_%s.tmpl')
 LINKLESS_TEMPLATE  = os.path.join(TEMPLATES, 'linkless.tmpl')
 
 VERSION, MINOR_VERSION = os.environ.get('CURRENT_VERSION_ID').split('.')
@@ -157,7 +158,7 @@ class PageHandler(webapp.RequestHandler):
     content = memcache.get(memcache_key)
     if content is None:
       logging.info("Rebuilding page for " + uri)
-      template_path = self.template_path()
+      template_path = self.template_path(*args)
       try:
         template_args = self.template_args(*args)
       except NotFound:
@@ -193,7 +194,7 @@ class AuthorHandler(PageHandler):
   def memcache_key(self, author):
     return "author=" + author
 
-  def template_path(self):
+  def template_path(self, author):
     return AUTHOR_TEMPLATE
     
   def template_args(self, author):
@@ -206,7 +207,7 @@ class TweeterHandler(PageHandler):
   def memcache_key(self, tweeter):
     return "tweeter=" + tweeter
 
-  def template_path(self):
+  def template_path(self, tweeter):
     return TWEETER_TEMPLATE
 
   def template_args(self, tweeter):
@@ -219,7 +220,7 @@ class OrganHandler(PageHandler):
   def memcache_key(self, organ):
     return "organ=" + organ
     
-  def template_path(self):
+  def template_path(self, organ):
     return ORGAN_TEMPLATE
 
   def template_args(self, organ):
@@ -248,7 +249,7 @@ class DateHandler(PageHandler):
   def memcache_key(self, date):
     return "date=" + date
 
-  def template_path(self):
+  def template_path(self, date):
     return DATE_TEMPLATE
 
   def template_args(self, datestr):
@@ -299,6 +300,26 @@ class FeedHandler(PageHandler):
   def content_type(self):
     return 'application/atom+xml'
 
+class TopHandler(PageHandler):
+  def memcache_key(self, what):
+    return "top=" + what
+  
+  def template_path(self, what):
+    return TOP_TEMPLATE % what
+  
+  def template_args(self, what):
+    if what == 'tweeter':
+      top_tweeters = data.Tweeter.all().order('-num_tweets').fetch(10)
+      return { 'tweeters': top_tweeters }
+    
+    elif what == 'author':
+      top_authors = data.Author.all().order('-num_tweets').fetch(10)
+      return { 'authors': top_authors }
+    
+    elif what == 'organ':
+      top_sites = data.Site.all().order('-num_tweets').fetch(10)
+      return { 'sites': top_sites }
+
 class TimelineHandler(PageHandler):
   def memcache_key(self, direction=None, date=None):
     if date is None:
@@ -343,6 +364,7 @@ def main():
     ('/tweeter/([^/]+)',   TweeterHandler),
     ('/organ/([^/]+)',     OrganHandler),
     ('/date/([^/]+)',      DateHandler),
+    ('/top/(.+)',          TopHandler),
     ('/linkless',          LinklessHandler),
   ], debug=DEBUG)
   wsgiref.handlers.CGIHandler().run(application)

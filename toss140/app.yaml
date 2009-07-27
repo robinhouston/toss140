@@ -35,6 +35,9 @@ handlers:
 - url: /date/\d{4}-\d\d-\d\d
   script: toss.py
 
+- url: /top/(tweeter|author|organ)
+  script: toss.py
+
 - url: /linkless
   script: toss.py
 
@@ -55,6 +58,14 @@ handlers:
 
 - url: /do/retweet
   script: update.py
+
+- url: /do/recount/(author|organ|tweeter)/.+
+  script: update.py
+  login: admin
+
+- url: /do/count
+  script: update.py
+  login: admin
 
 - url: /(toss\.css)
   static_files: \1

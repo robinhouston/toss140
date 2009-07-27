@@ -1,3 +1,4 @@
+from collections import defaultdict
 import htmlentitydefs
 import logging
 import os
@@ -347,6 +348,80 @@ class ReTweetHandler(webapp.RequestHandler):
     for destination in data.Destination.all():
       destination.post(truncated_text + suffix)
 
+class RecountHandler(webapp.RequestHandler):
+  def get(self, what, who):
+    who = urllib.unquote(who)
+
+    if what == 'author':
+      author = data.Author.get_by_name(who)
+      if not author:
+        self.error(404)
+        return
+      n = author.recount()
+      author.put()
+
+    elif what == 'organ':
+      site = data.Site.all().filter('name =', who).get()
+      if not site:
+        self.error(404)
+        return
+      n = site.recount()
+      site.put()
+
+    elif what == 'tweeter':
+      tweeter = data.Tweeter.get_by_name(who)
+      if not tweeter:
+        self.error(404)
+        return
+      n = tweeter.recount()
+      tweeter.put()
+    
+    self.response.headers["Content-Type"] = "text/plain"
+    self.response.out.write("%s '%s' has %d summaries\n" % (what, who, n))
+
+class CountHandler(webapp.RequestHandler):
+  def get(self):
+    authors, tweeters, articles, sites = map(defaultdict, [lambda: 0] * 4)
+    for tweet in data.Tweet.all():
+      if tweet.is_retweet:
+        continue
+      article = tweet.article
+      if not article:
+        continue
+      site = article.parent()
+      
+      if article.author:
+        authors[article.author] += 1 
+      tweeters[tweet.from_user] += 1
+      articles[article.key()] += 1
+      sites[site.key()] += 1
+    
+    self.response.headers["Content-Type"] = "text/plain; charset=utf-8"
+
+    self.response.out.write("Authors:\n")
+    for author_name, count in authors.items():
+      self.response.out.write("\t%s: %d\n" % (author_name, count))
+      data.Author.get_by_name(name=author_name, count=count).put()
+
+    self.response.out.write("\nTweeters:\n")
+    for tweeter_name, count in tweeters.items():
+      self.response.out.write("\t%s: %d\n" % (tweeter_name, count))
+      data.Tweeter.get_by_name(name=tweeter_name, count=count).put()
+    
+    self.response.out.write("\nArticles:\n")
+    for article_key, count in articles.items():
+      article = data.Article.get(article_key)
+      self.response.out.write("\t%s, %s, %s: %d\n" % (article.author, article.parent().name, str(article.date), count))
+      article.num_tweets = count
+      article.put()
+
+    self.response.out.write("\nSites:\n")
+    for site_key, count in sites.items():
+      site = data.Site.get(site_key)
+      self.response.out.write("\t%s: %d\n" % (site.name, count))
+      site.num_tweets = count
+      site.put()
+
 def main():
   application = webapp.WSGIApplication([
     ('/do/update',       UpdateHandler),
@@ -354,6 +429,8 @@ def main():
     ('/do/index-tweets', IndexTweetsHandler),
     ('/do/index-tweet',  IndexTweetHandler),
     ('/do/retweet',      ReTweetHandler),
+    ('/do/recount/(author|organ|tweeter)/(.+)', RecountHandler),
+    ('/do/count',        CountHandler),
   ], debug=True)
   wsgiref.handlers.CGIHandler().run(application)
 

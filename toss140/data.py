@@ -6,6 +6,19 @@ from google.appengine.api import memcache
 
 import oauth
 
+def _count(model, prop, value):
+  '''Count the number of instances of model whose property 'prop' has value 'value'.'''
+  q = model.all().filter(prop + ' = ', value)
+  n = q.count()
+  if n < 1000:
+    return n
+  # The limit of the count() method has been reached.
+  # Try the slow way -- though this will be limited by request timeout ultimately.
+  n = 0
+  for x in q:
+    n += 1
+  return n
+
 class Origin(db.Model):
   tag = db.StringProperty(required=True, default='toss140')
   api_url = db.LinkProperty(required=True)
@@ -44,7 +57,16 @@ class Destination(db.Model):
 class Site(db.Model):
   host = db.StringProperty(required=True)
   name = db.StringProperty(required=True)
-  num_summaries = db.IntegerProperty(required=True, default=0)
+  num_tweets = db.IntegerProperty(required=True, default=0)
+
+  def recount(self):
+    n = 0
+    for article in Article.all().ancestor(self):
+      if article.num_tweets:
+        n += article.num_tweets
+    self.num_tweets = n
+    self.put()
+    return n
 
 # Every Article should have a parent that is a Site
 # The key name is the ultimate URL of the article
@@ -54,6 +76,7 @@ class Article(db.Model):
   title  = db.StringProperty(required=False)
   date   = db.DateProperty  (required=False)
   added_at = db.DateTimeProperty(required=True, auto_now_add=True)
+  num_tweets = db.IntegerProperty(required=False)
   
   def tweets(self):
     return Tweet.all().filter('article =', self).order('-created_at')
@@ -76,13 +99,37 @@ class Tweet(db.Model):
   origin = db.ReferenceProperty(required=True, reference_class=Origin)
   article = db.ReferenceProperty(required=False, reference_class=Article, default=None)
 
-class Tweeter(db.Model):
+class _Counter(db.Model):
   name = db.StringProperty(required=True)
-  num_summaries = db.IntegerProperty(required=True, default=0)
+  num_tweets = db.IntegerProperty(required=True, default=0)
+  
+  def recount(self):
+    self.num_tweets = self._get_count()
+    return self.num_tweets
+  
+  @classmethod
+  def get_by_name(cls, name, count=None):
+    entity = cls.get_by_key_name('x' + name)
+    if entity:
+      if count:
+        entity.num_tweets = count
+      return entity
+    entity = cls(name=name, key_name = 'x' + name)
+    if count:
+      entity.num_tweets = count
+    else:
+      entity.recount()
+      if entity.num_tweets == 0:
+        return None
+    return entity
 
-class Author(db.Model):
-  name = db.StringProperty(required=True)
-  num_summaries = db.IntegerProperty(required=True, default=0)
+class Tweeter(_Counter):
+  def _get_count(self):
+    return _count(Tweet, 'from_user', self.name)
+
+class Author(_Counter):
+  def _get_count(self):
+    return _count(Article, 'author', self.name)
 
 class User(db.Model):
   id = db.IntegerProperty(required=True)
