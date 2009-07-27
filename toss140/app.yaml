@@ -1,5 +1,5 @@
 application: toss140
-version: 2
+version: 3
 runtime: python
 api_version: 1
 
@@ -66,6 +66,16 @@ handlers:
 - url: /do/count
   script: update.py
   login: admin
+
+- url: /do/expunge
+  script: update.py
+  login: admin
+
+- url: /login
+  script: toss.py
+
+- url: /authorized
+  script: toss.py
 
 - url: /(toss\.css)
   static_files: \1

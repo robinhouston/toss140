@@ -1,3 +1,5 @@
 cron:
   - url: /do/update
     schedule: every 5 minutes
+  - url: /do/expunge
+    schedule: every hour

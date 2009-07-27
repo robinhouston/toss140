@@ -4,6 +4,7 @@ from google.appengine.ext.webapp import template
 from google.appengine.api import users
 from google.appengine.api import memcache
 
+import base64
 import datetime
 import logging
 import os
@@ -123,6 +124,37 @@ class AdminLoginHandler(webapp.RequestHandler):
       url = '/'
     self.redirect(url)
 
+class LoginHandler(webapp.RequestHandler):
+  def get(self):
+    dest = data.Destination.all().get()
+    token, secret = dest.request_token()
+    nonce = base64.urlsafe_b64encode(os.urandom(33))
+    data.OAuthRequestToken(key_name = 'x' + token, secret=secret).put()
+    params = {
+      "oauth_token": token,
+      "oauth_callback": re.sub(r'/login.*', '/authorized', self.request.url)
+    }
+    self.redirect("http://twitter.com/oauth/authenticate?" + urllib.urlencode(params))
+
+class LoginAuthorizedHandler(webapp.RequestHandler):
+  def get(self):
+    r = self.request
+    token = r.get('oauth_token')
+    verifier = r.get('oauth_verifier')
+    oart = data.OAuthRequestToken.get_by_key_name('x' + token)
+    if not oart:
+      self.error(500)
+      return
+    secret = oart.secret
+    oart.delete()
+    dest = data.Destination.all().get()
+    
+    user = dest.user(token, secret)
+    
+    self.response.headers['Content-type'] = 'text/plain; charset=utf-8'
+    self.response.headers['Set-Cookie'] = 'user=' + str(user.key().name())
+    self.redirect('/')
+
 class NotFound(Exception):
   '''Raised by a page handler if the requested resource is not found'''
 
@@ -137,6 +169,11 @@ class PageHandler(webapp.RequestHandler):
   
   def get(self, *args):
     args = map(self._unquote, args)
+    user_key = self.request.cookies['user']
+    if user_key:
+      user = data.User.get_by_key_name(user_key)
+    else:
+      user = None
     admin = self.request.get('admin')
     if admin and not users.is_current_user_admin():
       self.redirect("/adminlogin?r=" + urllib.quote(self.request.uri))
@@ -167,6 +204,7 @@ class PageHandler(webapp.RequestHandler):
       
       template_args['debug'] = DEBUG
       template_args['admin'] = admin
+      template_args['user']  = user
       template_args['this_page'] = uri
       template_args['recent_tweets'] = recent_tweets(5)
   
@@ -353,6 +391,8 @@ class TimelineHandler(PageHandler):
 def main():
   application = webapp.WSGIApplication([
     ('/adminlogin',        AdminLoginHandler),
+    ('/login',             LoginHandler),
+    ('/authorized',        LoginAuthorizedHandler),
                            
     ('/',                  TimelineHandler),
     ('/atom.xml',          FeedHandler),

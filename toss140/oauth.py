@@ -29,20 +29,20 @@ class OAuth(object):
     string_to_sign = method + '&' + escape(url) + '&' + escape(urlencode(params))
     return base64.b64encode(hmac.new(key, string_to_sign, hashlib.sha1).digest())
 
-  def _params(self, url, token=None, secret='', *args):
+  def _params(self, url, token=None, secret='', extra=[]):
     params = [
       ("oauth_consumer_key", self.consumer_key),
-      ("oauth_nonce", base64.urlsafe_b64encode(os.urandom(32))),
+      ("oauth_nonce", base64.urlsafe_b64encode(os.urandom(33))),
       ("oauth_signature_method", "HMAC-SHA1"),
       ("oauth_timestamp", str(int(time.time()))),
     ]
 
     if token:
       params.append(("oauth_token", token))
-    params += args
+    params += extra
     params.append( ("oauth_signature", self._signature(url, params, secret=secret)) )
     return urllib.urlencode(params)
 
-  def oauth_request(self, url, *args, **kwargs):
-    f = urllib.urlopen(url, self._params(url, *args, **kwargs))
+  def oauth_request(self, url, token=None, secret='', payload=[]):
+    f = urllib.urlopen(url, self._params(url, token=token, secret=secret, extra=payload))
     return f.read()

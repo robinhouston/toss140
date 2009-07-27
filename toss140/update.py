@@ -1,4 +1,5 @@
 from collections import defaultdict
+import datetime
 import htmlentitydefs
 import logging
 import os
@@ -440,6 +441,12 @@ class CountHandler(webapp.RequestHandler):
       site.num_tweets = count
       site.put()
 
+class ExpungeHandler(webapp.RequestHandler):
+  '''Expunge old unexchanged request tokens.'''
+  one_hour_ago = datetime.datetime.now() - datetime.timedelta(hours=1)
+  for token in data.OAuthRequestToken.all().filter('added_at < ', one_hour_ago):
+    token.delete()
+
 def main():
   application = webapp.WSGIApplication([
     ('/do/update',       UpdateHandler),
@@ -449,6 +456,7 @@ def main():
     ('/do/retweet',      ReTweetHandler),
     ('/do/recount/(author|organ|tweeter)/(.+)', RecountHandler),
     ('/do/count',        CountHandler),
+    ('/do/expunge',      ExpungeHandler),
   ], debug=True)
   wsgiref.handlers.CGIHandler().run(application)
 

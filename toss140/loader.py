@@ -11,7 +11,7 @@ class OriginLoader(bulkloader.Loader):
     bulkloader.Loader.__init__(self, 'Origin',
       [
         ('tag', str),
-        ('api_url', str),
+        ('update_url', str),
         ('max_id', long),
         ('count', long),
       ])
@@ -22,10 +22,10 @@ class OriginExporter(bulkloader.Exporter):
   def __init__(self):
     bulkloader.Exporter.__init__(self, 'Origin',
       [
-        ('tag',     str, None),
-        ('api_url', str, None),
-        ('max_id',  str, None),
-        ('count',   str, None),
+        ('tag', str, None),
+        ('update_url', str, None),
+        ('max_id', str, None),
+        ('count', str, None),
       ])
 
 

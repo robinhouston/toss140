@@ -1,4 +1,6 @@
+import base64
 import logging
+import os
 import re
 import urllib
 
@@ -27,7 +29,9 @@ class Origin(db.Model):
   count = db.IntegerProperty(required=True, default=0)
 
 class Destination(db.Model):
-  api_url = db.LinkProperty(required=True, default='http://twitter.com/statuses/update.json')
+  update_url = db.LinkProperty(required=True, default='http://twitter.com/statuses/update.json')
+  request_token_url = db.LinkProperty(required=False, default='http://twitter.com/oauth/request_token')
+  access_token_url = db.LinkProperty(required=False, default='http://twitter.com/oauth/access_token')
 
   username = db.StringProperty(required=True, default='toss140')
   password = db.StringProperty(required=False, default='')
@@ -38,20 +42,74 @@ class Destination(db.Model):
   oauth_token_secret = db.StringProperty(required=False)
 
   def _url_with_basic_auth(self):
-    return self.api_url.replace('://', '://%s:%s@' % (self.username, self.password), 1)
+    return self.update_url.replace('://', '://%s:%s@' % (self.username, self.password), 1)
   
+  _oauth_object = None
+  def _oauth(self):
+    if not self._oauth_object:
+      self._oauth_object = oauth.OAuth(self.consumer_key, self.consumer_secret)
+    return self._oauth_object
+  
+  def _oauth_request(self, url, payload):
+    return self._oauth().oauth_request(url, self.oauth_token, self.oauth_token_secret, payload)
+    
   def post(self, message):
+    '''Post a status update to the destination.'''
     payload = [ ('status', message.encode('utf-8')) ]
     if self.password:
       url = self._url_with_basic_auth()
       fh = urllib.urlopen(url, urllib.urlencode(payload))
       response = fh.read()
     else:
-      response = oauth.OAuth(self.consumer_key, self.consumer_secret)\
-        .oauth_request(self.api_url, self.oauth_token, self.oauth_token_secret, *payload)
+      response = self._oauth().oauth_request(
+        self.update_url, self.oauth_token, self.oauth_token_secret, payload)
 
     logging.debug(response)
     return response
+  
+  def request_token(self):
+    response = self._oauth().oauth_request(self.request_token_url)
+    mo = re.match(r'^oauth_token=(.*)&oauth_token_secret=(.*)$', response)
+    token, secret = mo.groups()
+    return token, secret
+  
+  def user(self, request_token, request_token_secret):
+    response = self._oauth().oauth_request(self.access_token_url, request_token, request_token_secret)
+    mo = re.match(r'^oauth_token=(.*)&oauth_token_secret=(.*)&user_id=(.*)&screen_name=(.*)$', response)
+    token, secret, user_id, screen_name = mo.groups()
+    return User.create_or_update(long(user_id), screen_name, token, secret)
+
+class OAuthRequestToken(db.Model):
+  '''An OAuth request token. Deleted when it's been exchanged for an access token.'''
+  # key_name should be 'x' + token
+  secret = db.StringProperty(required=True)
+  added_at = db.DateTimeProperty(required=True, auto_now_add=True)
+
+class User(db.Model):
+  user_id = db.IntegerProperty(required=True)
+  name = db.StringProperty(required=False)
+  screen_name = db.StringProperty(required=True)
+  profile_image_url = db.LinkProperty(required=False)
+
+  oauth_token = db.StringProperty(required=True) # The access token
+  oauth_token_secret = db.StringProperty(required=True)
+
+  @classmethod
+  def create_or_update(cls, user_id, screen_name, oauth_token, oauth_token_secret):
+    user = cls.all().filter('user_id =', user_id).get()
+    if user:
+      user.oauth_token = oauth_token
+      user.oauth_token_secret = oauth_token_secret
+    else:
+      user = cls(
+        key_name = base64.urlsafe_b64encode(os.urandom(33)),
+        user_id = user_id,
+        screen_name = screen_name,
+        oauth_token = oauth_token,
+        oauth_token_secret = oauth_token_secret,
+      )
+      user.put()
+    return user
 
 # The key name is the hostname of the web site
 class Site(db.Model):
@@ -133,15 +191,6 @@ class Tweeter(_Counter):
 class Author(_Counter):
   def _get_count(self):
     return _count(Article, 'author', self.name)
-
-class User(db.Model):
-  id = db.IntegerProperty(required=True)
-  name = db.StringProperty(required=True)
-  screen_name = db.StringProperty(required=True)
-  profile_image_url = db.LinkProperty(required=True)
-  
-  oauth_token = db.StringProperty(required=True) # The access token
-  oauth_token_secret = db.StringProperty(required=True)
 
 def get_origins():
   return Origin.all().fetch(16)
