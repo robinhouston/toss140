@@ -48,8 +48,7 @@ class Destination(db.Model):
       response = fh.read()
     else:
       response = oauth.OAuth(self.consumer_key, self.consumer_secret)\
-        .oauth_request(self.api_url, self.oauth_token, self.oauth_token_secret,
-          payload)
+        .oauth_request(self.api_url, self.oauth_token, self.oauth_token_secret, *payload)
 
     logging.debug(response)
     return response
