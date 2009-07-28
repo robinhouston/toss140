@@ -34,8 +34,8 @@ LINKLESS_TEMPLATE  = os.path.join(TEMPLATES, 'linkless.tmpl')
 VERSION, MINOR_VERSION = os.environ.get('CURRENT_VERSION_ID').split('.')
 
 
-"""Load custom Django template filters"""
-webapp.template.register_template_library('filters')
+"""Load custom Django template filters and tags"""
+webapp.template.register_template_library('template_extensions')
 
 
 def articles_by_site(site, n=FETCH_SIZE):
@@ -126,10 +126,11 @@ class AdminLoginHandler(webapp.RequestHandler):
 
 class LoginHandler(webapp.RequestHandler):
   def get(self):
+    callback = self.request.get('r') or '/'
     dest = data.Destination.all().get()
     token, secret = dest.request_token()
     nonce = base64.urlsafe_b64encode(os.urandom(33))
-    data.OAuthRequestToken(key_name = 'x' + token, secret=secret).put()
+    data.OAuthRequestToken(key_name = 'x' + token, secret=secret, callback=callback).put()
     params = {
       "oauth_token": token,
       "oauth_callback": re.sub(r'/login.*', '/authorized', self.request.url)
@@ -153,7 +154,12 @@ class LoginAuthorizedHandler(webapp.RequestHandler):
     
     self.response.headers['Content-type'] = 'text/plain; charset=utf-8'
     self.response.headers['Set-Cookie'] = 'user=' + str(user.key().name())
-    self.redirect('/')
+    self.redirect(oart.callback)
+
+class LogoutHandler(webapp.RequestHandler):
+  def get(self):
+    self.response.headers['Set-Cookie'] = 'user='
+    self.redirect(os.environ.get('HTTP_REFERER'))
 
 class NotFound(Exception):
   '''Raised by a page handler if the requested resource is not found'''
@@ -192,33 +198,30 @@ class PageHandler(webapp.RequestHandler):
     if admin:
       memcache_key = 'admin:' + memcache_key
 
-    content = memcache.get(memcache_key)
-    if content is None:
-      logging.info("Rebuilding page for " + uri)
-      template_path = self.template_path(*args)
-      try:
-        template_args = self.template_args(*args)
-      except NotFound:
-        self.error(404)
-        return
-      
-      template_args['debug'] = DEBUG
-      template_args['admin'] = admin
-      template_args['user']  = user
-      template_args['this_page'] = uri
-      template_args['recent_tweets'] = recent_tweets(5)
-  
-      if admin:
-        template_args['q'] = '?admin=1'
-        template_args['refresh_url'] = uri + '&refresh=1'
-        template_args['logout_url']  = users.create_logout_url(self.request.uri)
-      else:
-        template_args['q'] = ''
-      content = template.render(template_path, template_args)
-      memcache.add(key=memcache_key, value=content, time=self.memcache_time(*args))
+    template_path = self.template_path(*args)
+    try:
+      template_args = self.template_args(*args)
+    except NotFound:
+      self.error(404)
+      return
+    
+    template_args['memcache_key'] = memcache_key
+    template_args['memcache_time'] = self.memcache_time(*args)
+    template_args['debug'] = DEBUG
+    template_args['admin'] = admin
+    template_args['user']  = user
+    template_args['this_page'] = uri
+    template_args['recent_tweets'] = recent_tweets(5)
+
+    if admin:
+      template_args['q'] = '?admin=1'
+      template_args['refresh_url'] = uri + '&refresh=1'
+      template_args['logout_url']  = users.create_logout_url(self.request.uri)
+    else:
+      template_args['q'] = ''
 
     self.response.headers['Content-type'] = self.content_type()
-    self.response.out.write(content)
+    self.response.out.write(template.render(template_path, template_args))
   
   def memcache_time(*args):
     '''The default is no timeout.'''
@@ -392,6 +395,7 @@ def main():
   application = webapp.WSGIApplication([
     ('/adminlogin',        AdminLoginHandler),
     ('/login',             LoginHandler),
+    ('/logout',            LogoutHandler),
     ('/authorized',        LoginAuthorizedHandler),
                            
     ('/',                  TimelineHandler),

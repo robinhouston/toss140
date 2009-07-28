@@ -1,5 +1,5 @@
 application: toss140
-version: 3
+version: 2
 runtime: python
 api_version: 1
 
@@ -72,6 +72,9 @@ handlers:
   login: admin
 
 - url: /login
+  script: toss.py
+
+- url: /logout
   script: toss.py
 
 - url: /authorized

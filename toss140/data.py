@@ -83,6 +83,7 @@ class OAuthRequestToken(db.Model):
   '''An OAuth request token. Deleted when it's been exchanged for an access token.'''
   # key_name should be 'x' + token
   secret = db.StringProperty(required=True)
+  callback = db.StringProperty(required=True, default='/')
   added_at = db.DateTimeProperty(required=True, auto_now_add=True)
 
 class User(db.Model):
@@ -159,6 +160,8 @@ class Tweet(db.Model):
 
   origin = db.ReferenceProperty(required=True, reference_class=Origin)
   article = db.ReferenceProperty(required=False, reference_class=Article, default=None)
+  
+  number_of_retweets = db.IntegerProperty(required=True, default=0)
 
 class _Counter(db.Model):
   name = db.StringProperty(required=True)

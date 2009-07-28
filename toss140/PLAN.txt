@@ -1,0 +1,16 @@
+This is the current, necessarily tentative, development roadmap.
+
+Implement counts (number of summaries per tweeter, author, organ).
+- recalculate the relevant ones when a new summary is added
+- an explicit recount tool that can be triggered after manual editing, or if something goes wrong
+- build placeholder pages for top tweeters &c (/top/(tweeter|author|organ) ?)
+
+Implement "sign in with twitter", with stored user info keyed by an opaque cookie value
+
+Allow users to post summaries directly from the site
+
+Count the retweets of each summary (and store the count with the summary)
+
+Auto-retweet button
+
+"Summarise this" bookmarklet, that you can click when reading an article to post a summary immediately without having to faff about shortening the link, going to twitter etc.
