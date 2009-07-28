@@ -365,7 +365,7 @@ class TimelineHandler(PageHandler):
     else:
       return "timeline=" + direction + '-' + date
 
-  def template_path(self):
+  def template_path(self, direction=None, datestr=None):
     return TIMELINE_TEMPLATE
 
   def template_args(self, direction=None, datestr=None):
