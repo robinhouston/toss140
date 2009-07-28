@@ -169,7 +169,7 @@ class PageHandler(webapp.RequestHandler):
   
   def get(self, *args):
     args = map(self._unquote, args)
-    user_key = self.request.cookies['user']
+    user_key = self.request.cookies.get('user')
     if user_key:
       user = data.User.get_by_key_name(user_key)
     else:
