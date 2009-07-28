@@ -12,6 +12,7 @@ import re
 import urllib
 
 import data
+import oauth
 
 DEBUG = True
 FETCH_SIZE = 20
@@ -155,6 +156,50 @@ class LoginAuthorizedHandler(webapp.RequestHandler):
     self.response.headers['Content-type'] = 'text/plain; charset=utf-8'
     self.response.headers['Set-Cookie'] = 'user=' + str(user.key().name())
     self.redirect(oart.callback)
+
+class AuthorizedHandler(webapp.RequestHandler):
+  def get(self, *args):
+    user_key = self.request.cookies.get('user')
+    if user_key:
+      self.user = data.User.get_by_key_name(user_key)
+    else:
+      self.user = None
+
+    if not self.user:
+      url = self.request.url
+      referer = os.environ.get('HTTP_REFERER')
+      if referer:
+        if '?' in url:
+          url += '&'
+        else:
+          url += '?'
+        url += 'ref=' + urllib.quote(referer)
+      else:
+        logging.info("No referer")
+      self.redirect('/login?' + urllib.urlencode( {'r': url} ))
+    
+    else:
+      referer = self.request.get('ref') or os.environ.get('HTTP_REFERER')
+      self.dest = data.Destination.all().get()
+      self.do(referer, *args)
+
+  def tweet(self, message):
+    self.user.tweet(message)
+
+class RTHandler(AuthorizedHandler):
+  def do(self, referer, tweet_key):
+    logging.info('Retweeting ' + tweet_key)
+    tweet = data.Tweet.get(tweet_key)
+    text = tweet.text
+    shorter_url = tweet.get_shorter_url()
+    max_text_length = 140 - 17 - len(tweet.from_user) - len(shorter_url)
+    if len(text) > max_text_length:
+      logging.info('text is longer than %d chars, truncating', max_text_length)
+      text = text[: max_text_length - 1] + u'\u2026'
+    message = u'RT @%s \u201C%s\u201D %s #toss140' % (tweet.from_user, text, shorter_url) 
+    logging.info(message)
+    self.tweet(message)
+    self.redirect(referer)
 
 class LogoutHandler(webapp.RequestHandler):
   def get(self):
@@ -397,6 +442,7 @@ def main():
     ('/login',             LoginHandler),
     ('/logout',            LogoutHandler),
     ('/authorized',        LoginAuthorizedHandler),
+    ('/rt/(.*)',           RTHandler),
                            
     ('/',                  TimelineHandler),
     ('/atom.xml',          FeedHandler),

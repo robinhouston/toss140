@@ -19,6 +19,11 @@ a.admin {
 	color: orange !important;
 }
 
+a.rt {
+	font-size: 70%;
+	color: orange !important;
+}
+
 #content {
 	background: #94E4E8;
 	width: 900px;

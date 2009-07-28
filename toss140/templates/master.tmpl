@@ -36,7 +36,7 @@
 				<div class="menu-item"><a href="/logout">sign out</a></div>
 				{{ user.screen_name }}
 			{% else %}
-				<div class="menu-item"><a href="/login?r={{ this_page|urlenc_uni }}">sign in</a></div>
+				<!-- <div class="menu-item"><a href="/login?r={{ this_page|urlenc_uni }}">sign in</a></div> -->
 			{% endif %}
 			{% if refresh_url %}
 				<div class="menu-item"><a href="{{refresh_url|escape}}">refresh</a></div>

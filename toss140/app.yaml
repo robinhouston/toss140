@@ -80,6 +80,9 @@ handlers:
 - url: /authorized
   script: toss.py
 
+- url: /rt/.*
+  script: toss.py
+
 - url: /(toss\.css)
   static_files: \1
   upload: toss\.css

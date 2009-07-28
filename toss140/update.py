@@ -99,7 +99,7 @@ def text_from_raw_text(raw_text):
 def _simple_fetch(url, method = 'GET'):
   logging.info('Fetching ' + url)
   return urlfetch.fetch(
-    url = url,
+    url = url.encode('utf-8'),
     follow_redirects = False,
     deadline = 10,
     allow_truncated = True,

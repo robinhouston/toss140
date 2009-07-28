@@ -6,6 +6,7 @@ import urllib
 
 from google.appengine.ext import db
 from google.appengine.api import memcache
+from google.appengine.api import urlfetch
 
 import oauth
 
@@ -45,13 +46,13 @@ class Destination(db.Model):
     return self.update_url.replace('://', '://%s:%s@' % (self.username, self.password), 1)
   
   _oauth_object = None
-  def _oauth(self):
+  def oauth(self):
     if not self._oauth_object:
       self._oauth_object = oauth.OAuth(self.consumer_key, self.consumer_secret)
     return self._oauth_object
   
   def _oauth_request(self, url, payload):
-    return self._oauth().oauth_request(url, self.oauth_token, self.oauth_token_secret, payload)
+    return self.oauth().oauth_request(url, self.oauth_token, self.oauth_token_secret, payload)
     
   def post(self, message):
     '''Post a status update to the destination.'''
@@ -61,20 +62,25 @@ class Destination(db.Model):
       fh = urllib.urlopen(url, urllib.urlencode(payload))
       response = fh.read()
     else:
-      response = self._oauth().oauth_request(
+      response = self.oauth().oauth_request(
         self.update_url, self.oauth_token, self.oauth_token_secret, payload)
 
     logging.debug(response)
     return response
   
   def request_token(self):
-    response = self._oauth().oauth_request(self.request_token_url)
+    response = self.oauth().oauth_request(self.request_token_url)
     mo = re.match(r'^oauth_token=(.*)&oauth_token_secret=(.*)$', response)
     token, secret = mo.groups()
     return token, secret
   
+  def tweet(self, user, message):
+    payload = [ ('status', message.encode('utf-8')) ]
+    response = self.oauth().oauth_request(
+      self.update_url, user.oauth_token, user.oauth_token_secret, payload)
+  
   def user(self, request_token, request_token_secret):
-    response = self._oauth().oauth_request(self.access_token_url, request_token, request_token_secret)
+    response = self.oauth().oauth_request(self.access_token_url, request_token, request_token_secret)
     mo = re.match(r'^oauth_token=(.*)&oauth_token_secret=(.*)&user_id=(.*)&screen_name=(.*)$', response)
     token, secret, user_id, screen_name = mo.groups()
     return User.create_or_update(long(user_id), screen_name, token, secret)
@@ -111,6 +117,10 @@ class User(db.Model):
       )
       user.put()
     return user
+  
+  def tweet(self, message):
+    dest = Destination.all().get()
+    return dest.tweet(self, message)
 
 # The key name is the hostname of the web site
 class Site(db.Model):
@@ -155,6 +165,7 @@ class Tweet(db.Model):
   raw_text = db.StringProperty(required=True, multiline=True)
   text = db.StringProperty(required=True, multiline=True)
   short_url = db.LinkProperty(required=False)
+  shorter_url = db.LinkProperty(required=False)
   long_url = db.LinkProperty(required=False)
   is_retweet = db.BooleanProperty(required=True, default=False)
 
@@ -162,6 +173,35 @@ class Tweet(db.Model):
   article = db.ReferenceProperty(required=False, reference_class=Article, default=None)
   
   number_of_retweets = db.IntegerProperty(required=True, default=0)
+  
+  def incr_retweets(self):
+    db.run_in_transaction(_incr_retweets, self)
+    self.number_of_retweets += 1
+  
+  def _incr_retweets(self):
+    tweet = Tweet.get(self.key())
+    tweet.number_of_retweets += 1
+    tweet.put()
+  
+  def get_shorter_url(self):
+    if not self.shorter_url:
+      if not self.long_url:
+        return None
+      response = urlfetch.fetch(
+        url = 'http://tinyarro.ws/api-create.php?utfpure=1\&url=' + self.long_url,
+        follow_redirects = False,
+        deadline = 10,
+        allow_truncated = True,
+        method = 'GET',
+      )
+      if response.status_code == 200:
+        self.shorter_url = response.content.decode('utf-8')
+      else:
+        logger.error("tinyarro.ws request failed")
+        return self.short_url
+      self.put()
+    return self.shorter_url
+    
 
 class _Counter(db.Model):
   name = db.StringProperty(required=True)

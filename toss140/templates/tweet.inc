@@ -13,6 +13,7 @@
 			href="/admin/datastore/edit?key={{ tweet.key }}&amp;kind=Tweet&amp;next={{ refresh_url|urlenc_uni }}">e</a>
 		<a class="admin" href="/do/index-tweet?key={{ tweet.key }}">r</a>
 	{%endif%}
+	<a class="rt" href="/rt/{{ tweet.key|urlenc_uni }}">RT</a>
 	<div class="tweeter">
 		<a title="All summaries by {{ tweet.from_user|escape }}"
 			href="/tweeter/{{ tweet.from_user|urlenc_uni }}{{q}}"
