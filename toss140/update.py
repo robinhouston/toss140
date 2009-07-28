@@ -44,6 +44,10 @@ def new_tweets_from_origin(origin):
   return results
 
 def store_tweet(tweet, ignore_link = False):
+  if re.search(r'toss140', tweet['source']) and tweet['text'].startswith("RT "):
+    logging.info("Ignoring retweet sent from site")
+    return None
+    
   logging.info("Storing tweet: %s", tweet)
   raw_text = html_unescape(tweet['text'])
   if ignore_link:
@@ -318,6 +322,9 @@ class AddTweetHandler(webapp.RequestHandler):
 
       return
     
+    if stored_tweet is None:
+      return
+
     task = taskqueue.Task(
       url='/do/retweet', countdown=0, method='POST',
       params={'key': stored_tweet.key()}

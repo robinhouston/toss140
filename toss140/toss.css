@@ -240,7 +240,7 @@ h2 a:visited, h2 a:link {
 	display: inline;
 	font-size: 80%;
 	color: #666;
-	margin-left: 4px;
+	margin-left: 0;
 }
 .tweeter a:link, .tweeter a:visited {
 	color: #559;

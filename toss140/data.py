@@ -175,7 +175,7 @@ class Tweet(db.Model):
   number_of_retweets = db.IntegerProperty(required=True, default=0)
   
   def incr_retweets(self):
-    db.run_in_transaction(_incr_retweets, self)
+    db.run_in_transaction(self._incr_retweets)
     self.number_of_retweets += 1
   
   def _incr_retweets(self):

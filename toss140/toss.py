@@ -159,6 +159,8 @@ class LoginAuthorizedHandler(webapp.RequestHandler):
 
 class AuthorizedHandler(webapp.RequestHandler):
   def get(self, *args):
+    return self.post(*args)
+  def post(self, *args):
     user_key = self.request.cookies.get('user')
     if user_key:
       self.user = data.User.get_by_key_name(user_key)
@@ -199,6 +201,7 @@ class RTHandler(AuthorizedHandler):
     message = u'RT @%s \u201C%s\u201D %s #toss140' % (tweet.from_user, text, shorter_url) 
     logging.info(message)
     self.tweet(message)
+    tweet.incr_retweets()
     self.redirect(referer)
 
 class LogoutHandler(webapp.RequestHandler):
