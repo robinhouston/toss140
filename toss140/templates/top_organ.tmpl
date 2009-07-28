@@ -1,0 +1,13 @@
+{% extends "master.tmpl" %}
+
+{% block title %}Top Sites | toss140.net{% endblock %}
+
+{% block content %}
+	<div id="top">
+	<h2>Top sites</h2>
+	{% for site in sites %}
+		<div><a href="/organ/{{ site.name|urlenc_uni }}{{q}}">{{ site.name }}</a> ({{ site.num_tweets }} summaries)</div>
+	{% endfor %}
+	</div>
+	{% include 'sidebar.inc' %}
+{% endblock %}

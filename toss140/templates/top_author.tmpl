@@ -1,0 +1,13 @@
+{% extends "master.tmpl" %}
+
+{% block title %}Top Authors | toss140.net{% endblock %}
+
+{% block content %}
+	<div id="top">
+	<h2>Top authors</h2>
+	{% for author in authors %}
+		<div><a href="/author/{{ author.name|urlenc_uni }}{{q}}">{{ author.name }}</a> ({{ author.num_tweets }} summaries)</div>
+	{% endfor %}
+	</div>
+	{% include 'sidebar.inc' %}
+{% endblock %}
