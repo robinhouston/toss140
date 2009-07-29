@@ -409,6 +409,14 @@ class TopHandler(PageHandler):
       top_sites = data.Site.all().order('-num_tweets').fetch(10)
       return { 'sites': top_sites }
 
+class lazy(object):
+  def __init__(self, f, *args):
+    self.f, self.args = f, args
+  def __call__(self):
+    if not self.value:
+      self.value = self.f(*self.args)
+    return self.value
+
 class TimelineHandler(PageHandler):
   def memcache_key(self, direction=None, date=None):
     if date is None:
@@ -426,15 +434,15 @@ class TimelineHandler(PageHandler):
     else:
       date = parse_iso_date(datestr)
       if direction == 'till':
-        articles = articles_till_date(date)
+        articles = lazy(articles_till_date, date)
       elif direction == 'since':
-        articles = articles_since_date(date)
+        articles = lazy(articles_since_date, date)
       else:
         raise NotFound
     return {
       "articles": articles,
-      "older":    date_before(articles[-1].date),
-      "newer":    date_after (articles[0].date),
+      "older":    lazy(lambda f: f(articles()[-1].date), date_before),
+      "newer":    lazy(lambda f: f(articles()[0].date),  date_after),
       "date":     date,
       "front":    True,
     }
