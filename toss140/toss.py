@@ -46,12 +46,16 @@ class lazy(object):
     if not self.computed:
       self.computed, self.value = True, self.f(*self.args)
     return self.value
+  def __getattr__(self, name):
+    return getattr(self(), name)
   def __iter__(self):
     return self().__iter__()
   def __str__(self):
     return str(self())
   def __nonzero__(self):
     return bool(self())
+  def __len__(self):
+    return len(self())
 
 
 def articles_by_site(site, n=FETCH_SIZE):
