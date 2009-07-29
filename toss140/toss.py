@@ -39,6 +39,21 @@ VERSION, MINOR_VERSION = os.environ.get('CURRENT_VERSION_ID').split('.')
 webapp.template.register_template_library('template_extensions')
 
 
+class lazy(object):
+  def __init__(self, f, *args):
+    self.f, self.args, self.value = f, args, None
+  def __call__(self):
+    if not self.value:
+      self.value = self.f(*self.args)
+    return self.value
+  def __iter__(self):
+    return self().__iter__()
+  def __str__(self):
+    return str(self())
+  def __nonzero__(self):
+    return bool(self())
+
+
 def articles_by_site(site, n=FETCH_SIZE):
   return data.Article.all().ancestor(site).order('-date').order('-added_at').fetch(n)
 
@@ -259,7 +274,7 @@ class PageHandler(webapp.RequestHandler):
     template_args['admin'] = admin
     template_args['user']  = user
     template_args['this_page'] = uri
-    template_args['recent_tweets'] = recent_tweets(5)
+    template_args['recent_tweets'] = lazy(recent_tweets, 5)
 
     if admin:
       template_args['q'] = '?admin=1'
@@ -289,7 +304,7 @@ class AuthorHandler(PageHandler):
   def template_args(self, author):
     return {
       "author":   author,
-      "articles": articles_by_author(author),
+      "articles": lazy(articles_by_author, author),
     }
 
 class TweeterHandler(PageHandler):
@@ -302,7 +317,7 @@ class TweeterHandler(PageHandler):
   def template_args(self, tweeter):
     return {
       "tweeter": tweeter,
-      "tweets":  tweets_by_tweeter(tweeter),
+      "tweets":  lazy(tweets_by_tweeter, tweeter),
     }
 
 class OrganHandler(PageHandler):
@@ -319,7 +334,7 @@ class OrganHandler(PageHandler):
     
     return {
       "site":     site,
-      "articles": articles_by_site(site),
+      "articles": lazy(articles_by_site, site),
     }
 
 class RecentHandler(PageHandler):
@@ -331,7 +346,7 @@ class RecentHandler(PageHandler):
 
   def template_args(self):
     return {
-      "tweets": recent_tweets(),
+      "tweets": lazy(recent_tweets),
     }
 
 class DateHandler(PageHandler):
@@ -343,13 +358,11 @@ class DateHandler(PageHandler):
 
   def template_args(self, datestr):
     date = parse_iso_date(datestr)
-    articles = articles_on_date(date)
-    logging.info("Found %d articles on %s", len(articles), str(date))
     return {
       "date":      date,
-      "date_prev": date_before(date),
-      "date_next": date_after(date),
-      "articles":  articles,
+      "date_prev": lazy(date_before, date),
+      "date_next": lazy(date_after, date),
+      "articles":  lazy(articles_on_date, date),
     }
 
 class LinklessHandler(PageHandler):
@@ -361,7 +374,7 @@ class LinklessHandler(PageHandler):
 
   def template_args(self):
     return {
-      "tweets": tweets_without_link(),
+      "tweets": lazy(tweets_without_link),
     }
 
 class AboutHandler(PageHandler):
@@ -383,7 +396,7 @@ class FeedHandler(PageHandler):
 
   def template_args(self):
     return {
-      "tweets": recent_tweets(1000)
+      "tweets": lazy(recent_tweets, 1000)
     }
   
   def content_type(self):
@@ -399,23 +412,15 @@ class TopHandler(PageHandler):
   def template_args(self, what):
     if what == 'tweeter':
       top_tweeters = data.Tweeter.all().order('-num_tweets').fetch(10)
-      return { 'tweeters': top_tweeters }
+      return { 'tweeters': lazy(top_tweeters) }
     
     elif what == 'author':
       top_authors = data.Author.all().order('-num_tweets').fetch(10)
-      return { 'authors': top_authors }
+      return { 'authors': lazy(top_authors) }
     
     elif what == 'organ':
       top_sites = data.Site.all().order('-num_tweets').fetch(10)
-      return { 'sites': top_sites }
-
-class lazy(object):
-  def __init__(self, f, *args):
-    self.f, self.args = f, args
-  def __call__(self):
-    if not self.value:
-      self.value = self.f(*self.args)
-    return self.value
+      return { 'sites': lazy(top_sites) }
 
 class TimelineHandler(PageHandler):
   def memcache_key(self, direction=None, date=None):
@@ -429,7 +434,7 @@ class TimelineHandler(PageHandler):
 
   def template_args(self, direction=None, datestr=None):
     if datestr is None:
-      articles = latest_articles()
+      articles = lazy(latest_articles)
       date = None
     else:
       date = parse_iso_date(datestr)
