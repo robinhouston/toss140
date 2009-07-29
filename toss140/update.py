@@ -450,9 +450,13 @@ class CountHandler(webapp.RequestHandler):
 
 class ExpungeHandler(webapp.RequestHandler):
   '''Expunge old unexchanged request tokens.'''
-  one_hour_ago = datetime.datetime.now() - datetime.timedelta(hours=1)
-  for token in data.OAuthRequestToken.all().filter('added_at < ', one_hour_ago):
-    token.delete()
+  def get(self):
+    one_hour_ago = datetime.datetime.now() - datetime.timedelta(hours=1)
+    n = 0
+    for token in data.OAuthRequestToken.all().filter('added_at < ', one_hour_ago):
+      n += 1
+      token.delete()
+    logging.info("Deleted %d unused request tokens", n)
 
 def main():
   application = webapp.WSGIApplication([
