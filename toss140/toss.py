@@ -41,10 +41,10 @@ webapp.template.register_template_library('template_extensions')
 
 class lazy(object):
   def __init__(self, f, *args):
-    self.f, self.args, self.value = f, args, None
+    self.f, self.args, self.computed = f, args, False
   def __call__(self):
-    if not self.value:
-      self.value = self.f(*self.args)
+    if not self.computed:
+      self.computed, self.value = True, self.f(*self.args)
     return self.value
   def __iter__(self):
     return self().__iter__()
